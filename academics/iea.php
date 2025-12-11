@@ -603,15 +603,6 @@ body {
         </div>
     </section>
 
-    <!-- News Carousel Section -->
-    <?php
-    $categoryId = 'International & External Affairs'; // Pass category name, component will look it up
-    $sectionTitle = 'International & External Affairs News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements from the International & External Affairs department.';
-    $facebookLink = 'https://www.facebook.com/iexternalaffairs'; // Facebook page URL for IEA
-    include '../app/includes/news-carousel.php';
-    ?>
-
     <!-- Mission & Vision Section -->
     <section class="mvp-section">
         <div class="container">
@@ -628,6 +619,21 @@ body {
             </div>
         </div>
     </section>
+
+    <!-- News Carousel Section -->
+    <?php
+    // Get category ID for this academics page
+    $academicsSlug = 'iea';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements from the International & External Affairs department.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
+    ?>
 
     <!-- Services Section -->
     <section id="services" class="services-section">

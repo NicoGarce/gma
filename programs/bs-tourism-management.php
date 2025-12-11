@@ -35,6 +35,20 @@ include '../app/includes/header.php';
         <div class="container">
             <div class="content-wrapper">
                 <div class="content-main">
+                    <?php
+                    // Get category ID for this program page
+                    $programSlug = 'bs-tourism-management';
+                    $categoryId = getCategoryIdByProgramSlug($programSlug);
+                    
+                    // Include news carousel if category exists and has posts
+                    if ($categoryId) {
+                        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+                        $sectionDescription = 'Stay updated with the latest news and updates from the BS Tourism Management program.';
+                        $hideFacebook = true; // Hide Facebook feed on program pages
+                        include '../app/includes/news-carousel.php';
+                    }
+                    ?>
+                    
                     <article class="content-article">
                         <div class="mission-vision-section">
                             <h2>About the Program</h2>
@@ -67,5 +81,7 @@ include '../app/includes/header.php';
     </main>
 
 <?php include '../app/includes/footer.php'; ?>
+
+
 
 

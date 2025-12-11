@@ -501,10 +501,17 @@ body {
 
     <!-- News Carousel Section -->
     <?php
-    $categoryId = 'Research'; // Pass category name, component will look it up
-    $sectionTitle = 'Research News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements from the Research department.';
-    include '../app/includes/news-carousel.php';
+    // Get category ID for this academics page
+    $academicsSlug = 'research';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements from the Research department.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
     ?>
 
     <!-- Mission and Vision Section -->

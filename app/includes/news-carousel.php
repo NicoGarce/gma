@@ -9,6 +9,7 @@
  * @param string $sectionTitle - Title for the carousel section
  * @param string $sectionDescription - Description for the carousel section
  * @param string $facebookLink - Optional Facebook page URL to display beside the news slider
+ * @param bool $hideFacebook - Set to true to hide Facebook feed (for program/academics pages)
  */
 
 // Ensure base_path is set (default to '../' if not set)
@@ -44,14 +45,14 @@ if ($categoryId) {
             <div class="section-header">
                 <h2 class="section-title">
                     <i class="fas fa-newspaper"></i>
-                    <?php echo htmlspecialchars($sectionTitle); ?>
+                    <?php echo htmlspecialchars(html_entity_decode($sectionTitle, ENT_QUOTES, 'UTF-8')); ?>
                 </h2>
                 <p class="section-description">
-                    <?php echo htmlspecialchars($sectionDescription); ?>
+                    <?php echo htmlspecialchars(html_entity_decode($sectionDescription, ENT_QUOTES, 'UTF-8')); ?>
                 </p>
             </div>
             
-            <div class="news-layout" style="display: grid; grid-template-columns: <?php echo isset($facebookLink) && !empty($facebookLink) ? '2fr 1fr' : '1fr'; ?>; gap: 2rem; align-items: start;">
+            <div class="news-layout" style="display: grid; grid-template-columns: <?php echo (isset($facebookLink) && !empty($facebookLink) && !isset($hideFacebook)) || (isset($facebookLink) && !empty($facebookLink) && isset($hideFacebook) && !$hideFacebook) ? '2fr 1fr' : '1fr'; ?>; gap: 2rem; align-items: start;">
                 <div class="news-content">
                     <div class="news-carousel-container">
                         <div class="news-carousel" id="newsCarousel-<?php echo $categoryId; ?>">
@@ -116,7 +117,7 @@ if ($categoryId) {
                     </div>
                 </div>
                 
-                <?php if (isset($facebookLink) && !empty($facebookLink)): ?>
+                <?php if (isset($facebookLink) && !empty($facebookLink) && (!isset($hideFacebook) || !$hideFacebook)): ?>
                     <div class="facebook-feed" style="position: sticky; top: 100px;">
                         <a href="<?php echo htmlspecialchars($facebookLink); ?>" target="_blank" rel="noopener" class="facebook-header" style="display: block; background: linear-gradient(135deg, #1877f2 0%, #0d5dbf 100%); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem; text-align: center; text-decoration: none; color: white; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                             <h3 class="facebook-title" style="margin: 0 0 0.5rem 0; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">

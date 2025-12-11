@@ -32,10 +32,17 @@ include '../app/includes/header.php';
     <main class="main-content">
         <!-- News Carousel Section -->
         <?php
-        $categoryId = 'University Clinic'; // Pass category name, component will look it up
-        $sectionTitle = 'University Clinic News & Updates';
-        $sectionDescription = 'Stay updated with the latest news and announcements from the University Clinic.';
-        include '../app/includes/news-carousel.php';
+        // Get category ID for this academics page
+        $academicsSlug = 'clinic';
+        $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+        
+        // Include news carousel if category exists and has posts
+        if ($categoryId) {
+            $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+            $sectionDescription = 'Stay updated with the latest news and announcements from the University Clinic.';
+            $hideFacebook = true; // Hide Facebook feed on academics pages
+            include '../app/includes/news-carousel.php';
+        }
         ?>
 
         <?php include '../app/includes/general-coming-soon.php'; ?>

@@ -114,6 +114,72 @@ function getAllCategories() {
     return $stmt->fetchAll();
 }
 
+// Get category ID by program page slug
+// Maps program page slugs (e.g., 'bs-nursing') to category names (e.g., 'BS Nursing')
+function getCategoryIdByProgramSlug($programSlug) {
+    // Define navbar items configuration (matching header.php)
+    $navbar_items_config = [
+        'programs' => [
+            'bs-nursing' => 'BS Nursing',
+            'bs-physical-therapy' => 'BS Physical Therapy',
+            'bs-information-technology' => 'BS Information Technology',
+            'bs-computer-science' => 'BS Computer Science',
+            'ba-communication-arts' => 'BA Communication Arts',
+            'senior-high-school' => 'Senior High School Tracks/Strands',
+            'bs-engineering' => 'BS Engineering',
+            'bs-accountancy' => 'BS Accountancy',
+            'bs-business-administration' => 'BS Business Administration',
+            'bachelor-secondary-education' => 'Bachelor of Secondary Education',
+            'call-center-training' => 'Call Center Training Program',
+            'basic-education' => 'Basic Education',
+            'bachelor-elementary-education' => 'Bachelor of Elementary Education',
+            'bs-hospitality-management' => 'BS Hospitality Management',
+            'bs-tourism-management' => 'BS Tourism Management',
+            'ab-bs-psychology' => 'AB/BS Psychology',
+            'english-proficiency-training' => 'English Proficiency Training'
+        ]
+    ];
+    
+    // Get the category name from the program slug
+    if (isset($navbar_items_config['programs'][$programSlug])) {
+        $categoryName = $navbar_items_config['programs'][$programSlug];
+        $category = getCategoryByName($categoryName);
+        return $category ? $category['id'] : null;
+    }
+    
+    return null;
+}
+
+// Get category ID by academics page slug
+// Maps academics page slugs (e.g., 'registrar') to category names (e.g., 'Registrar')
+function getCategoryIdByAcademicsSlug($academicsSlug) {
+    // Define navbar items configuration (matching header.php)
+    $navbar_items_config = [
+        'academics' => [
+            'admission-scholarship' => 'Admission & Scholarship',
+            'registrar' => 'Registrar',
+            'library' => 'Library',
+            'alumni' => 'Alumni',
+            'careers' => 'Careers',
+            'clinic' => 'University Clinic',
+            'cod' => 'Community Outreach Department',
+            'iea' => 'International & External Affairs',
+            'quality-assurance' => 'Quality Assurance',
+            'research' => 'Research',
+            'sps' => 'Student Personnel Services'
+        ]
+    ];
+    
+    // Get the category name from the academics slug
+    if (isset($navbar_items_config['academics'][$academicsSlug])) {
+        $categoryName = $navbar_items_config['academics'][$academicsSlug];
+        $category = getCategoryByName($categoryName);
+        return $category ? $category['id'] : null;
+    }
+    
+    return null;
+}
+
 // Get recent SDG posts
 function getRecentSDGPosts($limit = 10) {
     $pdo = getDBConnection();

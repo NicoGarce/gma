@@ -301,10 +301,17 @@ body {
 
     <!-- News Carousel Section -->
     <?php
-    $categoryId = 'Registrar';
-    $sectionTitle = 'Registrar News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements from the Registrar\'s Office.';
-    include '../app/includes/news-carousel.php';
+    // Get category ID for this academics page
+    $academicsSlug = 'registrar';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements from the Registrar\'s Office.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
     ?>
 
     <!-- Registrar Services Section -->

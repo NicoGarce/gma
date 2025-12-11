@@ -33,27 +33,33 @@ include '../app/includes/header.php';
 
     <!-- Main Content -->
     <main class="main-content">
-                        <!-- Introduction Section -->
-                        <section class="intro-section">
-                            <div class="container">
-                                <div class="intro-content">
-                                    <div class="intro-logo">
-                                        <img src="<?php echo $base_path; ?>assets/images/cod/UPHSL-COD.png" alt="Community Outreach Department Logo">
-                                    </div>
-                                    <h2>Community Outreach Department</h2>
-                                    <p class="intro-description">The Community Outreach Department is responsible for the implementation of community outreach and extension programs of the university. Its main objectives include, but are not limited to, improvement of health status of a community, enhancement of literacy of the community members, and cultivation of values and culture toward attaining improved quality of life as we exercise our virtue that Perpetualites are helpers of God.</p>
-                                </div>
-                            </div>
-                        </section>
+        <!-- Introduction Section -->
+        <section class="intro-section">
+            <div class="container">
+                <div class="intro-content">
+                    <div class="intro-logo">
+                        <img src="<?php echo $base_path; ?>assets/images/cod/UPHSL-COD.png" alt="Community Outreach Department Logo">
+                    </div>
+                    <h2>Community Outreach Department</h2>
+                    <p class="intro-description">The Community Outreach Department is responsible for the implementation of community outreach and extension programs of the university. Its main objectives include, but are not limited to, improvement of health status of a community, enhancement of literacy of the community members, and cultivation of values and culture toward attaining improved quality of life as we exercise our virtue that Perpetualites are helpers of God.</p>
+                </div>
+            </div>
+        </section>
 
-    <!-- News Carousel Section -->
-    <?php
-    $categoryId = 'Community Outreach Department'; // Pass category name, component will look it up
-    $sectionTitle = 'Community Outreach Department News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements from the Community Outreach Department.';
-    $facebookLink = 'https://www.facebook.com/uphslcod'; // Facebook page URL for COD
-    include '../app/includes/news-carousel.php';
-    ?>
+        <!-- News Carousel Section -->
+        <?php
+        // Get category ID for this academics page
+        $academicsSlug = 'cod';
+        $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+        
+        // Include news carousel if category exists and has posts
+        if ($categoryId) {
+            $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+            $sectionDescription = 'Stay updated with the latest news and announcements from the Community Outreach Department.';
+            $hideFacebook = true; // Hide Facebook feed on academics pages
+            include '../app/includes/news-carousel.php';
+        }
+        ?>
 
                         <!-- Mission, Vision, Philosophy Section -->
                         <section class="mvp-section">

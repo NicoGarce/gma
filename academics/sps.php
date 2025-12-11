@@ -622,6 +622,21 @@ body {
 </style>
 
 <main class="main-content">
+    <!-- News Carousel Section -->
+    <?php
+    // Get category ID for this academics page
+    $academicsSlug = 'sps';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements from the Student Personnel Services.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
+    ?>
+    
     <!-- Introduction Section -->
     <section class="intro-section">
         <div class="container">
@@ -643,10 +658,17 @@ body {
 
     <!-- News Carousel Section -->
     <?php
-    $categoryId = 'Student Personnel Services'; // Pass category name, component will look it up
-    $sectionTitle = 'Student Personnel Services News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements from the Student Personnel Services.';
-    include '../app/includes/news-carousel.php';
+    // Get category ID for this academics page
+    $academicsSlug = 'sps';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements from the Student Personnel Services.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
     ?>
 
     <!-- Admission and Discipline Section -->

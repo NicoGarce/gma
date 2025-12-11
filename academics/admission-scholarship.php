@@ -334,10 +334,17 @@ body {
 
     <!-- News Carousel Section -->
     <?php
-    $categoryId = 'Admission & Scholarship';
-    $sectionTitle = 'Admission & Scholarship News & Updates';
-    $sectionDescription = 'Stay updated with the latest news and announcements about admission and scholarship programs.';
-    include '../app/includes/news-carousel.php';
+    // Get category ID for this academics page
+    $academicsSlug = 'admission-scholarship';
+    $categoryId = getCategoryIdByAcademicsSlug($academicsSlug);
+    
+    // Include news carousel if category exists and has posts
+    if ($categoryId) {
+        $sectionTitle = 'Latest ' . getCategoryById($categoryId)['name'] . ' News';
+        $sectionDescription = 'Stay updated with the latest news and announcements about admission and scholarship programs.';
+        $hideFacebook = true; // Hide Facebook feed on academics pages
+        include '../app/includes/news-carousel.php';
+    }
     ?>
 
     <!-- Admission Requirements Section -->
