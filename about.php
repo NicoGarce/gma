@@ -1,0 +1,1732 @@
+<?php
+/**
+ * UPHSL About Us Page
+ * 
+ * @author Nico Roell D. Garce
+ * @title UPHSL Web Administrator 2025
+ * @description Information about the University of Perpetual Help System Laguna
+ */
+
+session_start();
+require_once 'app/config/database.php';
+require_once 'app/config/paths.php';
+require_once 'app/includes/functions.php';
+
+// Check if About Index or About section is in maintenance
+if (isSectionInMaintenance('about', 'about-index') || isSectionInMaintenance('about')) {
+    $page_title = "About - Maintenance";
+    $base_path = $GLOBALS['base_path'];
+    include 'app/includes/header.php';
+    if (displaySectionMaintenance('about', $base_path, 'about-index')) {
+        include 'app/includes/footer.php';
+        exit;
+    }
+}
+
+// Set page title
+$page_title = "About University of Perpetual Help System - GMA Campus";
+
+// Use the automatically detected base path
+$base_path = $GLOBALS['base_path'];
+
+// Include header
+include 'app/includes/header.php';
+?>
+
+<style>
+.about-intro {
+    background: 
+        url('<?php echo $base_path; ?>assets/images/about_intro_bg.png'),
+        linear-gradient(to bottom, #F8F8F8 0%, #F8F8F8 70%, rgba(248, 248, 248, 0) 100%);
+    background-size: contain, cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 6rem 0 4rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-intro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(28, 77, 161, 0.05) 0%, rgba(82, 123, 189, 0.05) 70%, transparent 100%);
+    z-index: 0;
+}
+
+.intro-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+}
+
+.intro-text h1 {
+    font-size: 2.8rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 900;
+    line-height: 1.2;
+    position: relative;
+}
+
+.intro-text h1::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
+}
+
+.intro-text .tagline {
+    font-size: 1.2rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 2rem;
+    font-style: italic;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+    text-transform: none;
+    opacity: 0.95;
+}
+
+.intro-text .description {
+    font-size: 1rem;
+    color: var(--text-dark);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.intro-visual {
+    position: relative;
+    height: 400px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.intro-visual img, .intro-visual video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.intro-visual:hover img, .intro-visual:hover video {
+    transform: scale(1.05);
+}
+
+.intro-visual::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(28, 77, 161, 0.3) 0%, rgba(82, 123, 189, 0.3) 100%);
+    z-index: 1;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 2rem;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-5px);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.about-content {
+    padding: 4rem 0;
+    background: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.about-content::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('<?php echo $base_path; ?>assets/images/FACADE.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    z-index: -2;
+    opacity: 0.4;
+}
+
+.about-content::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.8) 100%);
+    z-index: -1;
+}
+
+.content-section {
+    margin-bottom: 4rem;
+    position: relative;
+    z-index: 1;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 2px;
+}
+
+.section-content {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    line-height: 1.7;
+    font-size: 1rem;
+    color: var(--text-dark);
+    backdrop-filter: blur(5px);
+    position: relative;
+    z-index: 2;
+}
+
+.history-timeline {
+    position: relative;
+    margin-top: 3rem;
+    padding-left: 2rem;
+}
+
+.history-timeline::before {
+    content: '';
+    position: absolute;
+    left: 2rem;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    border-radius: 2px;
+}
+
+.timeline-item {
+    position: relative;
+    margin-bottom: 3rem;
+    padding-left: 4rem;
+    opacity: 0;
+    transform: translateX(-50px);
+    animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
+.timeline-item:nth-child(1) { animation-delay: 0.1s; }
+.timeline-item:nth-child(2) { animation-delay: 0.2s; }
+.timeline-item:nth-child(3) { animation-delay: 0.3s; }
+.timeline-item:nth-child(4) { animation-delay: 0.4s; }
+.timeline-item:nth-child(5) { animation-delay: 0.5s; }
+.timeline-item:nth-child(6) { animation-delay: 0.6s; }
+.timeline-item:nth-child(7) { animation-delay: 0.7s; }
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.5rem;
+    width: 20px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    border: 4px solid white;
+    box-shadow: 0 0 0 4px var(--primary-color);
+    z-index: 2;
+}
+
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    left: -1.5rem;
+    top: 0.5rem;
+    width: 20px;
+    height: 20px;
+    background: var(--secondary-color);
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s ease;
+    z-index: 1;
+    will-change: transform;
+}
+
+.timeline-item:hover::after {
+    transform: scale(1.05);
+}
+
+.timeline-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2.5rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(28, 77, 161, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+    will-change: transform;
+}
+
+.timeline-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(28, 77, 161, 0.6), rgba(82, 123, 189, 0.6));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+    will-change: transform;
+}
+
+.timeline-card:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.timeline-card:hover::before {
+    transform: scaleX(1);
+}
+
+.timeline-year {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.timeline-year::before {
+    content: '📅';
+    font-size: 1.2rem;
+}
+
+.timeline-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-dark);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.timeline-content {
+    color: var(--text-dark);
+    line-height: 1.7;
+    font-size: 1.05rem;
+}
+
+.timeline-highlight {
+    background: linear-gradient(135deg, rgba(28, 77, 161, 0.1), rgba(82, 123, 189, 0.1));
+    padding: 1rem;
+    border-radius: 10px;
+    margin-top: 1rem;
+    border-left: 4px solid var(--secondary-color);
+    font-style: italic;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+@keyframes slideInFromLeft {
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.board-member {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 2;
+    position: relative;
+}
+
+.board-member:hover {
+    transform: translateY(-5px);
+}
+
+.member-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.member-position {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.member-qualifications {
+    font-size: 0.85rem;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.campus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.campus-item {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(5px);
+    z-index: 2;
+    position: relative;
+}
+
+.campus-item:hover {
+    transform: translateY(-5px);
+}
+
+.campus-name {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+}
+
+.campus-location {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.philosophy-box {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--primary-color);
+    padding: 3rem;
+    border-radius: 15px;
+    text-align: center;
+    margin: 2rem 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(28, 77, 161, 0.1);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    z-index: 2;
+}
+
+.philosophy-box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    border-radius: 15px 15px 0 0;
+}
+
+.philosophy-quote {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-style: italic;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+    color: var(--primary-color);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.philosophy-quote::before {
+    content: '"';
+    font-size: 3rem;
+    color: var(--secondary-color);
+    position: absolute;
+    top: -10px;
+    left: -20px;
+    opacity: 0.3;
+    font-family: serif;
+}
+
+.philosophy-quote::after {
+    content: '"';
+    font-size: 3rem;
+    color: var(--secondary-color);
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    opacity: 0.3;
+    font-family: serif;
+}
+
+
+
+.philosophy-author {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+}
+
+
+
+.quality-objectives {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.objective-item {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid var(--secondary-color);
+    backdrop-filter: blur(5px);
+    z-index: 2;
+    position: relative;
+}
+
+.objective-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.objective-list {
+    list-style: none;
+    padding: 0;
+}
+
+.objective-list li {
+    padding: 0.5rem 0;
+    color: var(--text-dark);
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.objective-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--secondary-color);
+    font-weight: bold;
+}
+
+/* Perpetual Hymn Styling */
+.hymn-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(5px);
+    z-index: 2;
+    position: relative;
+    border: 2px solid rgba(28, 77, 161, 0.1);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.hymn-content {
+    text-align: center;
+}
+
+.hymn-verse, .hymn-chorus {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.verse-number, .chorus-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    font-weight: 700;
+    border-radius: 20px;
+    display: inline-block;
+    box-shadow: 0 3px 8px rgba(28, 77, 161, 0.3);
+    margin-bottom: 1rem;
+}
+
+.verse-number {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.chorus-header {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 8px 16px;
+}
+
+.verse-text, .chorus-text {
+    line-height: 1.7;
+    text-align: center;
+}
+
+.verse-text p, .chorus-text p {
+    margin: 0.5rem 0;
+    font-size: 1rem;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+
+/* Responsive Hymn Styling */
+@media (max-width: 768px) {
+    .hymn-container {
+        padding: 1.5rem;
+        max-width: 500px;
+    }
+    
+    .hymn-verse, .hymn-chorus {
+        margin-bottom: 1.5rem;
+    }
+    
+    .verse-number {
+        width: 35px;
+        height: 35px;
+        font-size: 1rem;
+    }
+    
+    .chorus-header {
+        font-size: 0.85rem;
+        padding: 6px 12px;
+    }
+    
+    .verse-text p, .chorus-text p {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .hymn-container {
+        padding: 1.2rem;
+        max-width: 400px;
+    }
+    
+    .hymn-verse, .hymn-chorus {
+        margin-bottom: 1.2rem;
+    }
+    
+    .verse-number {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    
+    .chorus-header {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .verse-text p, .chorus-text p {
+        font-size: 0.85rem;
+    }
+}
+
+/* Simple Wood Frame Styling for Mission and Vision */
+.mission-vision-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin: 3rem 0;
+}
+
+.mission-frame, .vision-frame {
+    position: relative;
+    background: #8B4513;
+    padding: 4px;
+    border-radius: 8px;
+    box-shadow: 
+        0 0 0 1px #DAA520,
+        0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.mission-frame:hover, .vision-frame:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 0 1px #DAA520,
+        0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+.mission-content, .vision-content {
+    background: rgba(255, 254, 247, 0.95);
+    padding: 3rem 2.5rem;
+    border-radius: 6px;
+    position: relative;
+    border: 1px solid #F5E6A3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(5px);
+    z-index: 2;
+}
+
+.mission-title, .vision-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #8B4513;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    position: relative;
+    letter-spacing: 0.5px;
+}
+
+.mission-title::after, .vision-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 2px;
+    background: #DAA520;
+    border-radius: 1px;
+}
+
+.mission-text, .vision-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #2F4F4F;
+    text-align: justify;
+    position: relative;
+    font-weight: 400;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.mission-text p, .vision-text p {
+    margin-bottom: 1.5rem;
+    text-indent: 1.5rem;
+    flex: 1;
+}
+
+.mission-text p:last-child, .vision-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Tablet and Mobile Responsive */
+@media (max-width: 1024px) {
+    .mission-vision-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        margin: 2.5rem 0;
+    }
+    
+    .mission-text, .vision-text {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .mission-text p, .vision-text p {
+        text-indent: 1.2rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .philosophy-quote {
+        font-size: 1.4rem;
+    }
+    
+    .philosophy-author {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .intro-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .intro-text h1 {
+        font-size: 2.2rem;
+    }
+    
+    .intro-text .tagline {
+        font-size: 1.1rem;
+        letter-spacing: 0.2px;
+    }
+    
+    .intro-text .description {
+        font-size: 0.95rem;
+    }
+    
+    .intro-visual {
+        height: 300px;
+    }
+    
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        max-width: 100%;
+    }
+    
+    .stat-item {
+        padding: 1.5rem;
+    }
+    
+    .stat-number {
+        font-size: 1.8rem;
+    }
+    
+    .stat-label {
+        font-size: 0.85rem;
+    }
+    
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .section-content {
+        padding: 2rem;
+        font-size: 0.95rem;
+    }
+    
+    .board-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .member-name {
+        font-size: 1rem;
+    }
+    
+    .member-position {
+        font-size: 0.85rem;
+    }
+    
+    .member-qualifications {
+        font-size: 0.8rem;
+    }
+    
+    .campus-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .quality-objectives {
+        grid-template-columns: 1fr;
+    }
+    
+    .history-timeline {
+        padding-left: 1.5rem;
+        margin-top: 2.5rem;
+    }
+    
+    .history-timeline::before {
+        left: 1.5rem;
+        width: 2px;
+    }
+    
+    .timeline-item {
+        padding-left: 3rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .timeline-item::before {
+        left: -1rem;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .timeline-item::after {
+        left: -1rem;
+        width: 14px;
+        height: 14px;
+    }
+    
+    .timeline-card {
+        padding: 1.8rem;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-year {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-title {
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        line-height: 1.3;
+    }
+    
+    .timeline-content {
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+    
+    .timeline-highlight {
+        padding: 1rem;
+        font-size: 0.9rem;
+        margin-top: 1rem;
+    }
+}
+
+@media (max-width: 600px) {
+    .history-timeline {
+        padding-left: 1.2rem;
+        margin-top: 2rem;
+    }
+    
+    .history-timeline::before {
+        left: 1.2rem;
+        width: 2px;
+    }
+    
+    .timeline-item {
+        padding-left: 2.5rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .timeline-item::before {
+        left: -0.8rem;
+        width: 12px;
+        height: 12px;
+    }
+    
+    .timeline-item::after {
+        left: -0.8rem;
+        width: 12px;
+        height: 12px;
+    }
+    
+    .timeline-card {
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-year {
+        font-size: 1.1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .timeline-title {
+        font-size: 1rem;
+        margin-bottom: 0.8rem;
+        line-height: 1.3;
+    }
+    
+    .timeline-content {
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .timeline-highlight {
+        padding: 0.8rem;
+        font-size: 0.85rem;
+        margin-top: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .intro-text h1 {
+        font-size: 1.8rem;
+    }
+    
+    .intro-text .tagline {
+        font-size: 1rem;
+    }
+    
+    .intro-text .description {
+        font-size: 0.9rem;
+    }
+    
+    .section-title {
+        font-size: 1.6rem;
+    }
+    
+    .section-content {
+        padding: 1.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .stat-number {
+        font-size: 1.6rem;
+    }
+    
+    .stat-label {
+        font-size: 0.8rem;
+    }
+    
+    .member-name {
+        font-size: 0.9rem;
+    }
+    
+    .member-position {
+        font-size: 0.8rem;
+    }
+    
+    .member-qualifications {
+        font-size: 0.75rem;
+    }
+    
+    .history-timeline {
+        padding-left: 1rem;
+        margin-top: 2rem;
+    }
+    
+    .history-timeline::before {
+        left: 1rem;
+        width: 2px;
+    }
+    
+    .timeline-item {
+        padding-left: 2.2rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .timeline-item::before {
+        left: -0.7rem;
+        width: 10px;
+        height: 10px;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    .timeline-item::after {
+        left: -0.7rem;
+        width: 10px;
+        height: 10px;
+    }
+    
+    .timeline-card {
+        padding: 1.3rem;
+        border-radius: 12px;
+        margin-left: 0;
+        margin-bottom: 1rem;
+    }
+    
+    .timeline-year {
+        font-size: 1rem;
+        margin-bottom: 0.7rem;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.3rem;
+    }
+    
+    .timeline-year::before {
+        font-size: 0.9rem;
+    }
+    
+    .timeline-title {
+        font-size: 0.95rem;
+        margin-bottom: 0.7rem;
+        line-height: 1.3;
+    }
+    
+    .timeline-content {
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    
+    .timeline-highlight {
+        padding: 0.7rem;
+        font-size: 0.8rem;
+        margin-top: 0.7rem;
+        border-radius: 6px;
+    }
+}
+
+@media (max-width: 360px) {
+    .history-timeline {
+        padding-left: 0.8rem;
+        margin-top: 2rem;
+    }
+    
+    .history-timeline::before {
+        left: 0.8rem;
+        width: 1.5px;
+    }
+    
+    .timeline-item {
+        padding-left: 1.8rem;
+        margin-bottom: 2rem;
+    }
+    
+    .timeline-item::before {
+        left: -0.5rem;
+        width: 8px;
+        height: 8px;
+    }
+    
+    .timeline-item::after {
+        left: -0.5rem;
+        width: 8px;
+        height: 8px;
+    }
+    
+    .timeline-card {
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+    }
+    
+    .timeline-year {
+        font-size: 0.9rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .timeline-title {
+        font-size: 0.85rem;
+        margin-bottom: 0.6rem;
+    }
+    
+    .timeline-content {
+        font-size: 0.8rem;
+        line-height: 1.4;
+    }
+    
+    .timeline-highlight {
+        padding: 0.6rem;
+        font-size: 0.75rem;
+        margin-top: 0.6rem;
+    }
+    
+    .mission-frame, .vision-frame {
+        padding: 3px;
+        border-radius: 6px;
+    }
+    
+    .mission-content, .vision-content {
+        padding: 2.5rem 2rem;
+        border-radius: 4px;
+        height: auto;
+    }
+    
+    .mission-title, .vision-title {
+        font-size: 1.5rem;
+        margin-bottom: 1.2rem;
+    }
+    
+    .mission-text, .vision-text {
+        font-size: 0.95rem;
+        line-height: 1.6;
+        flex: none;
+    }
+    
+    .mission-text p, .vision-text p {
+        text-indent: 1.2rem;
+        margin-bottom: 1.2rem;
+        flex: none;
+    }
+    
+    .mission-text, .vision-text {
+        font-size: 0.85rem;
+        line-height: 1.4;
+    }
+    
+    .philosophy-quote {
+        font-size: 1.2rem;
+    }
+    
+    .philosophy-author {
+        font-size: 0.75rem;
+    }
+}
+</style>
+
+<main class="main-content">
+    <!-- Introduction Section -->
+    <section class="about-intro">
+        <div class="container">
+            <div class="intro-content">
+                <div class="intro-text">
+                    <h1>About<br>University of Perpetual Help System<br>GMA Campus</h1>
+                    <div class="tagline">Character Building is Nation Building</div>
+                    <div class="description">
+                        The University of Perpetual Help System – GMA Campus started its operation in 1997. The campus is located in San Gabriel, General Mariano Alvarez, Cavite. As part of the University of Perpetual Help System, we are committed to developing Filipino leaders through quality education, character formation, and community service, upholding our founding principles of excellence and service.
+                    </div>
+                </div>
+                <div class="intro-visual">
+                    <img src="<?php echo $base_path; ?>assets/images/FACADE.jpg" alt="UPHSL Main Campus" class="about-poster" data-about-video="<?php echo $base_path; ?>assets/video/AD2025.mp4" data-about-poster="<?php echo $base_path; ?>assets/images/FACADE.jpg">
+                </div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">27+</div>
+                    <div class="stat-label">Years of Service</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">17+</div>
+                    <div class="stat-label">Programs Offered</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">GMA</div>
+                    <div class="stat-label">Cavite Campus</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="about-content">
+        <div class="container">
+            <!-- About GMA Campus Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">About Us</h2>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help System, having committed itself to service in the forefront of education and health care, came into being out of the unselfish effort and untiring commitment of its founder: Dr. Jose G. Tamayo and Dr. Josefina Laperal Tamayo. The desire to serve others was manifested at a very young age when Dr. Jose G. Tamayo, then a young boy dreamt of being a doctor. For him, it was the best way he that he could serve his fellowmen. But when that dream became a reality, he realized that his best was not good enough the services he rendered were so limited and only within the realm of his profession as a doctor. With an ardent desire to serve his fellowmen, the idea of reaching out to through the setting up of an educational institution, gave birth to the following:</p>
+                    <br><br>
+                    <p><strong>University of Perpetual Help System – GMA Campus</strong> started its operation in 1997. The campus is located in San Gabriel, General Mariano Alvarez, Cavite.</p>
+                </div>
+            </div>
+
+            <!-- Philosophy Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Our Philosophy</h2>
+                </div>
+                <div class="philosophy-box">
+                    <div class="philosophy-quote">"Character Building is Nation Building"</div>
+                    <div class="philosophy-author">- University of Perpetual Help System</div>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help System believes that national development and transformation are predicated on the quality of the education of its people. Towards this end, the institution is committed to the ideas of teaching, community service and research with "Character Building is Nation Building" as its guiding principle.</p>
+                </div>
+            </div>
+
+            <!-- Mission and Vision Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Mission & Vision</h2>
+                </div>
+                <div class="mission-vision-container">
+                    <!-- Mission Frame -->
+                    <div class="mission-frame">
+                        <div class="mission-content">
+                            <h3 class="mission-title">Mission</h3>
+                            <div class="mission-text">
+                                <p>The University of Perpetual Help System is dedicated to the development of the Filipino as a leader. It aims to graduate dynamic students who are physically, intellectually, socially and spiritually committed to the achievement of the highest quality of life.</p>
+                                
+                                <p>As a system of service in health and education, the University of Perpetual Help System is dedicated to the formation of Christian service and research-oriented professional, leader and citizen with great social concern and with commitment to the delivery of quality education and health care.</p>
+                                
+                                <p>It shall produce Perpetualites who outstandingly value the virtues of reaching out and helping others as vital ingredients to nation building.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Vision Frame -->
+                    <div class="vision-frame">
+                        <div class="vision-content">
+                            <h3 class="vision-title">Vision</h3>
+                            <div class="vision-text">
+                                <p>The University of Perpetual Help System is a premier University that provides unique and innovative educational processes, contents, end-results for the pursuit of excellence in academics, technology, and research through community partnership and industry linkages.</p>
+                                
+                                <p>The University takes the lead role as a catalyst for human resource development, continues to inculcate values as way of strengthening the moral fiber of the Filipino individuals proud of their race and prepared for exemplary global participation in the realm of arts, sciences, humanities, and business.</p>
+                                
+                                <p>It sees the Filipino people enjoying quality and abundant life, living in peace and building a nation that the next generations shall be nourishing, cherishing and valuing.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Values Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">The Eight Perpetualite Core Values</h2>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help System is guided by eight core values that shape our educational philosophy and community culture:</p>
+                    <ol style="margin-top: 1.5rem; padding-left: 2rem; line-height: 2;">
+                        <li style="margin-bottom: 0.75rem;"><strong>Love of God</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Love of Self, Family, and Neighbors</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Love of Country and Good Governance</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Academic and Professional Excellence</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Health and Ecological Consciousness</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Peace and Global Solidarity</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Filipino Christian Leadership</strong></li>
+                        <li style="margin-bottom: 0.75rem;"><strong>Value of Catholic Christian Doctrine</strong></li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- History Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Our History</h2>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help System has grown from a single campus to a network of educational institutions across the Philippines. Here is our journey:</p>
+                    
+                    <div class="history-timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">1968</div>
+                                <div class="timeline-title">Perpetual Help College Manila</div>
+                                <div class="timeline-content">Opened with Nursing as key a course offering. Most graduate are now in the USA who formed themselves into Perpetualites Association of America and serving as a direct linkage for Perpetualite students and alumni there.</div>
+                                <div class="timeline-highlight">🏥 First campus established with focus on healthcare education</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">1970</div>
+                                <div class="timeline-title">Perpetual Help College Malasiqui</div>
+                                <div class="timeline-content">Located in the heart of Municipality of Malasiqui, Pangasinan, it was founded to accelerate the development of health education in the rural areas particularly in the Province of Pangasinan.</div>
+                                <div class="timeline-highlight">🌾 Expanding healthcare education to rural communities</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">1975</div>
+                                <div class="timeline-title">University of Perpetual Help Rizal</div>
+                                <div class="timeline-content">The eldest son, Antonio, inspired by his parents, spearheaded the founding of another school in the City of Las Piñas. The Molino Campus in Bacoor, Cavite and Calamba Campus in Laguna are extension programs which started their operations in 1996 and 1997 respectively.</div>
+                                <div class="timeline-highlight">👨‍👩‍👧‍👦 Family legacy continues with second generation leadership</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">1976</div>
+                                <div class="timeline-title">University of Perpetual Help System Laguna</div>
+                                <div class="timeline-content">Opened its door for academic excellence with a total of 89 students in the first and second and 367 students in the tertiary level. The campus is located along the old national highway in Biñan which is very accessible.</div>
+                                <div class="timeline-highlight">🎓 Main campus established with comprehensive academic programs</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">1976</div>
+                                <div class="timeline-title">UPH-Dr. Jose G. Tamayo Medical University</div>
+                                <div class="timeline-content">Formed specializing in medical and health related courses and also located in Biñan, Laguna.</div>
+                                <div class="timeline-highlight">⚕️ Dedicated medical university for specialized healthcare education</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card" style="border: 2px solid var(--primary-color); box-shadow: 0 12px 35px rgba(28, 77, 161, 0.2);">
+                                <div class="timeline-year">1997</div>
+                                <div class="timeline-title">University of Perpetual Help System – GMA Campus</div>
+                                <div class="timeline-content">Started its operation in San Gabriel, General Mariano Alvarez, Cavite. The GMA Campus was established to bring quality education closer to the communities in Cavite, offering a wide range of academic programs from basic education to college degrees.</div>
+                                <div class="timeline-highlight">🏢 Our Campus: Serving the community of General Mariano Alvarez, Cavite since 1997</div>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-card">
+                                <div class="timeline-year">Present</div>
+                                <div class="timeline-title">Isabela Campus</div>
+                                <div class="timeline-content">The youngest satellite of the university system. It aims to provide the northern part of the country an avenue to bring out the nurture the seeds of excellence through Perpetualite education.</div>
+                                <div class="timeline-highlight">🌟 Latest addition to the UPHSL family of campuses</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Board of Directors Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Board of Directors</h2>
+                </div>
+                <div class="board-grid">
+                    <div class="board-member">
+                        <div class="member-name">Dr./BGen. Antonio Laperal Tamayo, GSC, FPCHA, Ph.D.</div>
+                        <div class="member-position">Chairman of the Board, CEO and President</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Ma. Theresa T. Salazar, MD, MS</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Marianito L. Tamayo, BSFA</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Arcadio L. Tamayo, MD, PhD</div>
+                        <div class="member-position">Chancellor & EVP</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Roberto L. Tamayo, BSC, EdD</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Manuel L. Tamayo, BSC</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Maj. Rafael L. Tamayo, BSC, MBA</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Marcia Ana L. Tamayo, BSC ARCH</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Ma. Florencia T. Tampoya, MD FAAFP</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Jose Mauro L. Tamayo, BSC</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Ma. Consorcia L. Tamayo, BSC</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                    
+                    <div class="board-member">
+                        <div class="member-name">Maj. Victor L. Tamayo, MD, MHA</div>
+                        <div class="member-position">Board Member</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quality Policy Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Quality Policy</h2>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help System Laguna/University of Perpetual Help Dr. Jose G. Tamayo Medical University (UPHSL/UPHDJGTMU) is committed to producing competent and competitive professionals who are holistic graduates, achievers of life imbued with Christian values and research oriented leaders in quality education and health care.</p>
+                    
+                    <p><strong>Pursuing our commitment through:</strong></p>
+                    <ul>
+                        <li>Relevant and updated curriculum</li>
+                        <li>Internationalization</li>
+                        <li>Student-oriented curricular and extra-curricular programs</li>
+                        <li>Adept delivery mechanism</li>
+                        <li>Intellectual and professional fulfillment of faculty and staff</li>
+                        <li>Quality research</li>
+                        <li>Corporate Social Responsibility</li>
+                        <li>Involvement of all stakeholders in growth and development of the University</li>
+                        <li>Continuous upgrading of infrastructure and facilities</li>
+                        <li>Creation of congenial and conducive work environment</li>
+                        <li>Spiritual formation</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Core Values Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">UPHS Core Values</h2>
+                </div>
+                <div class="section-content">
+                    <p>The University of Perpetual Help Laguna, Binan Campus is planned and designed to open the windows and doors of opportunities for a holistic approach to quality education. The educational processes, contents and end-results are anchored on its guiding philosophy that is, <strong>"Character Building is Nation Building"</strong>.</p>
+                    
+                    <p style="margin-top: 1.5rem;">The University of Perpetual Help Laguna is increasing and strengthening its local and international linkages and networks with existing and diverse leadership coming from relevant and known industries, academic institutions and non-government organizations (NGOs). Below are the core values of our University:</p>
+                    
+                    <div class="quality-objectives" style="margin-top: 2rem;">
+                        <div class="objective-item">
+                            <div class="objective-title">Love</div>
+                            <ul class="objective-list">
+                                <li>Love of God, Self, Neighbor, and Country</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Spiritual Values</div>
+                            <ul class="objective-list">
+                                <li>Value of Catholic Doctrines</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Excellence</div>
+                            <ul class="objective-list">
+                                <li>Academic and Professional Excellence</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Governance</div>
+                            <ul class="objective-list">
+                                <li>Love of Country and Good Governance</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Solidarity</div>
+                            <ul class="objective-list">
+                                <li>Peace and Global solidarity</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Consciousness</div>
+                            <ul class="objective-list">
+                                <li>Health and Ecological Consciousness</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="objective-item">
+                            <div class="objective-title">Leadership</div>
+                            <ul class="objective-list">
+                                <li>Filipino Christian Leadership</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p style="margin-top: 2rem;"><strong>Inclusive Environment:</strong> The University promotes a community that is open, safe and supportive by providing quality education and at the same time welcome Perpetualites of all gender identities, respecting their expressions to thrive in an inclusive and affirming academic and campus environment.</p>
+                </div>
+            </div>
+
+            <!-- Quality Objectives Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">UPHS Quality Objectives</h2>
+                </div>
+                <div class="quality-objectives">
+                    <div class="objective-item">
+                        <div class="objective-title">Professional Excellence</div>
+                        <ul class="objective-list">
+                            <li>To develop professionals with appropriate technical and professional competencies for international market imbued with Perpetualite values</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Regulatory Compliance</div>
+                        <ul class="objective-list">
+                            <li>To comply with the regulatory and statutory requirements, fostering accountability, integrity, and alignment with educational standards</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Global Recognition</div>
+                        <ul class="objective-list">
+                            <li>To achieve recognition as one of the formidable universities both locally and internationally, ensuring the satisfaction of our learners and interested parties</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Knowledge Generation</div>
+                        <ul class="objective-list">
+                            <li>To serve as a venue for knowledge generation, dissemination, and utilization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Community Development</div>
+                        <ul class="objective-list">
+                            <li>To uplift the quality of life of people living in the adopted community</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Technology & Innovation</div>
+                        <ul class="objective-list">
+                            <li>To keep abreast with technology and innovation in the educational landscape</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="objective-item">
+                        <div class="objective-title">Intellectual Property Management</div>
+                        <ul class="objective-list">
+                            <li>To manage intellectual property to encourage innovation and protection of the rights of creators</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perpetual Hymn Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Perpetual Hymn</h2>
+                </div>
+                <div class="hymn-container">
+                    <div class="hymn-content">
+                        <div class="hymn-verse">
+                            <div class="verse-number">I</div>
+                            <div class="verse-text">
+                                <p>Perpetual Help thy fount of truth</p>
+                                <p>Where knowledge emanates</p>
+                                <p>Where we have learned life will bear fruit</p>
+                                <p>For us success awaits</p>
+                            </div>
+                        </div>
+                        
+                        <div class="hymn-chorus">
+                            <div class="chorus-header">CHORUS</div>
+                            <div class="chorus-text">
+                                <p>Thy children here we sing for thee</p>
+                                <p>We raise our voices clear</p>
+                                <p>We'll shout and cheer in unity</p>
+                                <p>For Alma Mater dear.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="hymn-verse">
+                            <div class="verse-number">II</div>
+                            <div class="verse-text">
+                                <p>Training the mind and the heart and the hands</p>
+                                <p>Ready to serve as best as we can,</p>
+                                <p>Perpetual Help by the banner we stand,</p>
+                                <p>Loyal and true spread thy fame</p>
+                                <p>O'er the land.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="hymn-verse">
+                            <div class="verse-number">R</div>
+                            <div class="verse-text">
+                                <p><em>Repeat I and Chorus</em></p>
+                                <p>We'll shout and cheer in unity</p>
+                                <p>For Alma Mater dear.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Our Campuses Section -->
+            <div class="content-section">
+                <div class="section-header">
+                    <h2 class="section-title">Our Campuses</h2>
+                </div>
+                <div class="campus-grid">
+                    <div class="campus-item">
+                        <div class="campus-name">Binan, Laguna</div>
+                        <div class="campus-location">Sto. Niño, City of Biñan, Laguna</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">GMA, Cavite</div>
+                        <div class="campus-location">San Gabriel, General Mariano Alvarez, Cavite</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">Sampaloc, Manila</div>
+                        <div class="campus-location">1240 V. Concepcion Street, Sampaloc, Manila</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">Malasiqui, Pangasinan</div>
+                        <div class="campus-location">Montemayor Street, Poblacion, Malasiqui, Pangasinan</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">Cauayan, Isabela</div>
+                        <div class="campus-location">Minante I, Cauayan City, Isabela</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">Panay, Roxas</div>
+                        <div class="campus-location">Pueblo de Panay, Roxas City</div>
+                    </div>
+                    
+                    <div class="campus-item">
+                        <div class="campus-name">UPH-Dr. Jose G. Tamayo Medical University</div>
+                        <div class="campus-location">Binan, Laguna</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    </main>
+
+
+<?php
+// Include footer
+include 'app/includes/footer.php';
+?>

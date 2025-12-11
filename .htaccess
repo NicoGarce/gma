@@ -1,0 +1,67 @@
+# Enable URL rewriting
+RewriteEngine On
+
+# Security Headers - Essential Protection for entire website
+<IfModule mod_headers.c>
+    # Prevent clickjacking attacks
+    Header always set X-Frame-Options "SAMEORIGIN"
+    
+    # Prevent MIME type sniffing attacks
+    Header always set X-Content-Type-Options "nosniff"
+    
+    # Prevent XSS attacks
+    Header always set X-XSS-Protection "1; mode=block"
+    
+    # Control referrer information
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    
+    # Enforce HTTPS (uncomment when using SSL)
+    # Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+</IfModule>
+
+# Prevent directory browsing
+Options -Indexes
+
+# Deny access to sensitive files
+<Files "*.log">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.sql">
+    Order allow,deny
+    Deny from all
+</Files>
+
+<Files "*.bak">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Remove .php extension from URLs
+# External redirect from .php to non-.php (301 permanent redirect)
+# Exclude AJAX endpoints from redirect (they need to keep .php extension for POST requests)
+RewriteCond %{THE_REQUEST} \s/+(.*)\.php[\s?] [NC]
+RewriteCond %{THE_REQUEST} !ajax- [NC]
+RewriteRule ^ /%1 [R=301,L]
+
+# Internal rewrite to add .php extension for files that exist
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/?$ $1.php [L]
+
+# Handle subdirectories (like programs/, support-services/, etc.)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/([^/]+)/?$ $1/$2.php [L]
+
+# Handle deeper subdirectories (like programs/aviation, support-services/sps, etc.)
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^([^/]+)/([^/]+)/([^/]+)/?$ $1/$2/$3.php [L]
+
+# Handle about directory redirect
+RewriteRule ^about/?$ about.php [L]
