@@ -147,6 +147,34 @@ include 'app/includes/header.php';
             </header>
 
             <!-- Featured Image or Image Slider -->
+            <?php 
+            // Fallback: If getPostImages() returns empty, try direct query
+            if (empty($images)) {
+                $pdo = getDBConnection();
+                $debugStmt = $pdo->prepare("SELECT * FROM post_images WHERE post_id = ? ORDER BY sort_order ASC, created_at ASC");
+                $debugStmt->execute([$post['id']]);
+                $debugImages = $debugStmt->fetchAll(PDO::FETCH_ASSOC);
+                
+                if (!empty($debugImages)) {
+                    // Images exist in DB - use them
+                    $images = $debugImages;
+                }
+            }
+            
+            // If still no images, check if featured_image exists and use it as fallback
+            if (empty($images) && !empty($post['featured_image'])) {
+                // Create a fake image array from featured_image so we can use the same display logic
+                $images = [['image_path' => $post['featured_image']]];
+            }
+            
+            // Debug output - TEMPORARY
+            echo "<!-- Debug: Images count: " . count($images) . " -->";
+            echo "<!-- Debug: Featured image: " . htmlspecialchars($post['featured_image'] ?? 'none') . " -->";
+            echo "<!-- Debug: Post ID: " . $post['id'] . " -->";
+            if (!empty($images)) {
+                echo "<!-- Debug: First image path: " . htmlspecialchars($images[0]['image_path'] ?? 'none') . " -->";
+            }
+            ?>
             <?php if (!empty($images)): ?>
                 <div class="post-images">
                     <?php if (count($images) > 1): ?>
@@ -154,11 +182,31 @@ include 'app/includes/header.php';
                         <div class="image-slider">
                             <div class="slider-container">
                                 <?php foreach ($images as $index => $image): ?>
+                                    <?php 
+                                    // Format image path - handle both absolute paths and relative paths (same as home page)
+                                    $imgPath = $image['image_path'];
+                                    if (strpos($imgPath, 'http') === 0) {
+                                        // Already absolute URL
+                                        $imgSrc = $imgPath;
+                                    } elseif (strpos($imgPath, '/') === 0) {
+                                        // Already has leading slash (absolute from root)
+                                        $imgSrc = $imgPath;
+                                    } elseif (strpos($imgPath, 'uploads/') === 0) {
+                                        // Relative path starting with uploads/ - use as is
+                                        $imgSrc = $imgPath;
+                                    } else {
+                                        // Fallback: assume it's a filename and prepend uploads/
+                                        $imgSrc = 'uploads/' . $imgPath;
+                                    }
+                                    // Debug: Uncomment to see the actual path being used
+                                    // echo "<!-- Debug: Image path: " . htmlspecialchars($imgSrc) . " -->";
+                                    ?>
                                     <div class="slide <?php echo $index === 0 ? 'active' : ''; ?>">
-                                        <img src="<?php echo XSS::escapeAttr($image['image_path']); ?>" 
-                                             alt="<?php echo XSS::escapeAttr($image['image_alt'] ?? $post['title']); ?>"
+                                        <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" 
+                                             alt="<?php echo htmlspecialchars($image['image_alt'] ?? $post['title'], ENT_QUOTES, 'UTF-8'); ?>"
                                              class="slide-image"
-                                             decoding="async">
+                                             decoding="async"
+                                             onerror="console.error('Failed to load image: <?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>'); this.style.display='none';">
                                     </div>
                                 <?php endforeach; ?>
                             </div>
@@ -181,14 +229,60 @@ include 'app/includes/header.php';
                         </div>
                     <?php else: ?>
                         <!-- Single Image -->
+                        <?php 
+                        // Format image path - handle both absolute paths and relative paths (same as home page)
+                        $imgPath = $images[0]['image_path'];
+                        if (strpos($imgPath, 'http') === 0) {
+                            // Already absolute URL
+                            $imgSrc = $imgPath;
+                        } elseif (strpos($imgPath, '/') === 0) {
+                            // Already has leading slash (absolute from root)
+                            $imgSrc = $imgPath;
+                        } elseif (strpos($imgPath, 'uploads/') === 0) {
+                            // Relative path starting with uploads/ - use as is
+                            $imgSrc = $imgPath;
+                        } else {
+                            // Fallback: assume it's a filename and prepend uploads/
+                            $imgSrc = 'uploads/' . $imgPath;
+                        }
+                        // Debug: Uncomment to see the actual path being used
+                        // echo "<!-- Debug: Single image path: " . htmlspecialchars($imgSrc) . " -->";
+                        ?>
                         <div class="single-image">
-                            <img src="<?php echo XSS::escapeAttr($images[0]['image_path']); ?>" 
-                                 alt="<?php echo XSS::escapeAttr($images[0]['image_alt'] ?? $post['title']); ?>"
+                            <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" 
+                                 alt="<?php echo htmlspecialchars($images[0]['image_alt'] ?? $post['title'], ENT_QUOTES, 'UTF-8'); ?>"
                                  class="featured-image"
-                                 decoding="async">
+                                 decoding="async"
+                                 onerror="console.error('Failed to load image: <?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>'); this.style.display='none';">
                         </div>
                     <?php endif; ?>
                 </div>
+            <?php else: ?>
+                <!-- No images found - this should not happen if featured_image exists -->
+                <?php if (!empty($post['featured_image'])): ?>
+                    <!-- Fallback: Display featured_image directly -->
+                    <?php 
+                    $img = $post['featured_image'];
+                    // Normalize path
+                    if (strpos($img, 'http') === 0) {
+                        $imgSrc = $img;
+                    } elseif (strpos($img, 'uploads/') === 0) {
+                        $imgSrc = $img;
+                    } elseif (strpos($img, '/') === 0) {
+                        $imgSrc = $img;
+                    } else {
+                        $imgSrc = 'uploads/' . $img;
+                    }
+                    ?>
+                    <div class="post-images">
+                        <div class="single-image">
+                            <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" 
+                                 alt="<?php echo htmlspecialchars($post['title'], ENT_QUOTES, 'UTF-8'); ?>"
+                                 class="featured-image"
+                                 decoding="async">
+                        </div>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
 
             <!-- Post Content -->

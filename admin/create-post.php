@@ -240,13 +240,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if images are provided (for new posts) or exist (for edited posts)
         $hasImages = false;
         if ($isEdit && $postId > 0) {
-            // For edits, check if post already has images
+            // For edits, allow save if:
+            // - the post already has at least one record in post_images, OR
+            // - the post has a featured_image set, OR
+            // - new images are being uploaded
             $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_images WHERE post_id = ?");
             $stmt->execute([$postId]);
             $result = $stmt->fetch();
-            $hasImages = ($result['count'] > 0) || !empty($_FILES['images']['name'][0]);
+            $existingImageCount = isset($result['count']) ? (int)$result['count'] : 0;
+            $hasExistingImageRecords = $existingImageCount > 0;
+            
+            // Get featured_image from database if not already loaded
+            $hasFeaturedImage = false;
+            if (isset($post['featured_image']) && !empty($post['featured_image'])) {
+                $hasFeaturedImage = true;
+            } else {
+                // Query database for featured_image
+                $stmt = $pdo->prepare("SELECT featured_image FROM posts WHERE id = ?");
+                $stmt->execute([$postId]);
+                $postData = $stmt->fetch();
+                $hasFeaturedImage = !empty($postData['featured_image'] ?? '');
+            }
+            
+            $hasNewUploads = !empty($_FILES['images']['name'][0]);
+            $hasImages = $hasExistingImageRecords || $hasFeaturedImage || $hasNewUploads;
         } else {
-            // For new posts, images must be uploaded
+            // For new posts, at least one image upload is required
             $hasImages = !empty($_FILES['images']['name'][0]);
         }
         
@@ -260,23 +279,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Transaction started");
             
             if ($isEdit && $postId > 0) {
+                // Generate new slug from title when updating
+                $slug = generateUniqueSlug($title, 'posts', $postId);
+                
                 // Update existing post - different query based on user role
                 if (isAuthor()) {
                     // Authors can only update their own posts
                     $stmt = $pdo->prepare("
                         UPDATE posts 
-                        SET title = ?, content = ?, excerpt = ?, status = ?, published_at = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP 
+                        SET title = ?, slug = ?, content = ?, excerpt = ?, status = ?, published_at = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP 
                         WHERE id = ? AND author_id = ?
                     ");
-                    $stmt->execute([$title, $content, $excerpt, $status, $publishedDate, $categoryId, $postId, $_SESSION['user_id']]);
+                    $stmt->execute([$title, $slug, $content, $excerpt, $status, $publishedDate, $categoryId, $postId, $_SESSION['user_id']]);
                 } else {
                     // Admins and Super Admins can update any post
                     $stmt = $pdo->prepare("
                         UPDATE posts 
-                        SET title = ?, content = ?, excerpt = ?, status = ?, published_at = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP 
+                        SET title = ?, slug = ?, content = ?, excerpt = ?, status = ?, published_at = ?, category_id = ?, updated_at = CURRENT_TIMESTAMP 
                         WHERE id = ?
                     ");
-                    $stmt->execute([$title, $content, $excerpt, $status, $publishedDate, $categoryId, $postId]);
+                    $stmt->execute([$title, $slug, $content, $excerpt, $status, $publishedDate, $categoryId, $postId]);
                 }
                 
                 if ($stmt->rowCount() === 0) {
@@ -293,34 +315,68 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $postId = $pdo->lastInsertId();
             }
             
+            // Get current featured image path before any operations
+            $stmt = $pdo->prepare("SELECT featured_image FROM posts WHERE id = ?");
+            $stmt->execute([$postId]);
+            $currentPost = $stmt->fetch();
+            $currentFeaturedImage = $currentPost['featured_image'] ?? '';
+            
             // Check current image count before deletion
             $stmt = $pdo->prepare("SELECT COUNT(*) as count FROM post_images WHERE post_id = ?");
             $stmt->execute([$postId]);
             $currentImageCount = $stmt->fetch()['count'];
-            $deletingCount = isset($_POST['delete_images']) && is_array($_POST['delete_images']) ? count($_POST['delete_images']) : 0;
+            $deletingCount = isset($_POST['delete_images']) && is_array($_POST['delete_images']) && !empty($_POST['delete_images']) ? count(array_filter($_POST['delete_images'], 'is_numeric')) : 0;
             $uploadingCount = !empty($_FILES['images']['name'][0]) ? count(array_filter($_FILES['images']['name'])) : 0;
             
             // Validate that at least one image will remain after deletion
-            if ($isEdit && ($currentImageCount - $deletingCount + $uploadingCount) < 1) {
-                throw new Exception('At least one image is required. Please keep existing images or upload new ones.');
+            // For edits, allow if: post_images will remain, OR featured_image exists, OR new images are being uploaded
+            if ($isEdit) {
+                $imagesAfterDeletion = $currentImageCount - $deletingCount + $uploadingCount;
+                $hasFeaturedImageFallback = !empty($currentFeaturedImage);
+                
+                if ($imagesAfterDeletion < 1 && !$hasFeaturedImageFallback && $uploadingCount === 0) {
+                    throw new Exception('At least one image is required. Please keep existing images or upload new ones.');
+                }
             }
             
             // Handle deletion of existing images
-            if (isset($_POST['delete_images']) && is_array($_POST['delete_images'])) {
+            $deletedFeaturedImage = false;
+            if (isset($_POST['delete_images']) && is_array($_POST['delete_images']) && !empty($_POST['delete_images'])) {
+                $uploadDir = dirname(__DIR__) . '/uploads/';
+                
                 foreach ($_POST['delete_images'] as $imageId) {
+                    // Validate image ID is numeric
+                    $imageId = filter_var($imageId, FILTER_VALIDATE_INT);
+                    if ($imageId === false || $imageId <= 0) {
+                        continue; // Skip invalid image IDs
+                    }
+                    
                     // Get image path before deleting
                     $stmt = $pdo->prepare("SELECT image_path FROM post_images WHERE id = ? AND post_id = ?");
                     $stmt->execute([$imageId, $postId]);
                     $image = $stmt->fetch();
                     
                     if ($image) {
+                        // Check if this is the featured image
+                        if ($currentFeaturedImage && $image['image_path'] === $currentFeaturedImage) {
+                            $deletedFeaturedImage = true;
+                        }
+                        
                         // Delete from database
                         $stmt = $pdo->prepare("DELETE FROM post_images WHERE id = ?");
                         $stmt->execute([$imageId]);
                         
-                        // Delete file from server
-                        if (file_exists($image['image_path'])) {
-                            unlink($image['image_path']);
+                        // Delete file from server - convert relative path to absolute
+                        $imagePath = $image['image_path'];
+                        // If path is relative (starts with 'uploads/'), convert to absolute
+                        if (strpos($imagePath, 'uploads/') === 0) {
+                            $absolutePath = dirname(__DIR__) . '/' . $imagePath;
+                        } else {
+                            $absolutePath = $imagePath;
+                        }
+                        
+                        if (file_exists($absolutePath)) {
+                            @unlink($absolutePath); // Suppress errors if file doesn't exist
                         }
                     }
                 }
@@ -328,7 +384,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Handle image uploads
             error_log("Image upload debug - FILES array: " . print_r($_FILES, true));
-            if (!empty($_FILES['images']['name'][0])) {
+            error_log("Image upload debug - Checking if images exist: " . (isset($_FILES['images']) ? 'yes' : 'no'));
+            if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
                 error_log("Image upload: Processing " . count($_FILES['images']['name']) . " files");
                 $uploadDir = dirname(__DIR__) . '/uploads/';
                 error_log("Current working directory: " . getcwd());
@@ -339,9 +396,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 $uploadedImages = [];
-                $imageCount = count($_FILES['images']['name']);
+                // Filter out empty file names to get actual count
+                $imageCount = count(array_filter($_FILES['images']['name']));
                 
-                for ($i = 0; $i < $imageCount; $i++) {
+                if ($imageCount === 0) {
+                    error_log("No valid images found in upload");
+                    throw new Exception('No valid images were uploaded. Please select at least one image file.');
+                }
+                
+                error_log("Processing $imageCount image(s)");
+                $actualIndex = 0;
+                for ($i = 0; $i < count($_FILES['images']['name']); $i++) {
+                    // Skip empty file names
+                    if (empty($_FILES['images']['name'][$i])) {
+                        continue;
+                    }
+                    
                     error_log("Processing image $i: " . $_FILES['images']['name'][$i] . " (error: " . $_FILES['images']['error'][$i] . ")");
                     if ($_FILES['images']['error'][$i] === UPLOAD_ERR_OK) {
                         $fileName = $_FILES['images']['name'][$i];
@@ -376,37 +446,96 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         
                         // Generate unique filename
                         $uniqueFileName = uniqid() . '_' . time() . '.' . $fileExtension;
-                        $uploadPath = $uploadDir . $uniqueFileName;
                         
-                        // Ensure filename doesn't contain path traversal
-                        $uploadPath = realpath($uploadDir) . '/' . basename($uniqueFileName);
+                        // Ensure filename doesn't contain path traversal - use basename for safety
+                        $safeFileName = basename($uniqueFileName);
+                        
+                        // Construct upload path - ensure directory exists and use absolute path
+                        $realUploadDir = realpath($uploadDir);
+                        if ($realUploadDir === false) {
+                            // If realpath fails, use the original path (directory should exist from mkdir above)
+                            $uploadPath = rtrim($uploadDir, '/\\') . DIRECTORY_SEPARATOR . $safeFileName;
+                        } else {
+                            $uploadPath = $realUploadDir . DIRECTORY_SEPARATOR . $safeFileName;
+                        }
                         
                         if (move_uploaded_file($fileTmpName, $uploadPath)) {
                             error_log("Image uploaded successfully: $uploadPath");
+                            
+                            // Verify file was actually moved
+                            if (!file_exists($uploadPath)) {
+                                throw new Exception("Image file was not saved correctly: $uploadPath");
+                            }
+                            
                             // Optimize image for better performance
                             optimizeImage($uploadPath, $detectedMime);
+                            
                             // Store relative path in database (from root directory)
-                            $relativePath = 'uploads/' . $uniqueFileName;
+                            $relativePath = 'uploads/' . $safeFileName;
+                            
                             // Insert image record
                             $imageStmt = $pdo->prepare("
                                 INSERT INTO post_images (post_id, image_path, sort_order) 
                                 VALUES (?, ?, ?)
                             ");
-                            $imageStmt->execute([$postId, $relativePath, $i]);
-                            $uploadedImages[] = $relativePath;
-                            error_log("Image record inserted into database with path: $relativePath");
+                            if ($imageStmt->execute([$postId, $relativePath, $actualIndex])) {
+                                $uploadedImages[] = $relativePath;
+                                error_log("Image record inserted into database with path: $relativePath for post ID: $postId");
+                                $actualIndex++;
+                            } else {
+                                $errorInfo = $imageStmt->errorInfo();
+                                error_log("Failed to insert image record: " . print_r($errorInfo, true));
+                                throw new Exception("Failed to save image record to database: " . ($errorInfo[2] ?? 'Unknown error'));
+                            }
                         } else {
-                            error_log("Failed to move uploaded file: $fileTmpName to $uploadPath");
+                            $errorMsg = "Failed to move uploaded file: $fileTmpName to $uploadPath";
+                            error_log($errorMsg);
+                            // Check if it's a permissions issue
+                            if (!is_writable($uploadDir)) {
+                                throw new Exception("Upload directory is not writable: $uploadDir");
+                            }
+                            throw new Exception($errorMsg);
                         }
+                    } else {
+                        error_log("Image upload error for file $i: " . $_FILES['images']['error'][$i]);
+                        $errorMessages = [
+                            UPLOAD_ERR_INI_SIZE => 'The uploaded file exceeds the upload_max_filesize directive in php.ini',
+                            UPLOAD_ERR_FORM_SIZE => 'The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form',
+                            UPLOAD_ERR_PARTIAL => 'The uploaded file was only partially uploaded',
+                            UPLOAD_ERR_NO_FILE => 'No file was uploaded',
+                            UPLOAD_ERR_NO_TMP_DIR => 'Missing a temporary folder',
+                            UPLOAD_ERR_CANT_WRITE => 'Failed to write file to disk',
+                            UPLOAD_ERR_EXTENSION => 'A PHP extension stopped the file upload'
+                        ];
+                        $errorMsg = $errorMessages[$_FILES['images']['error'][$i]] ?? 'Unknown upload error';
+                        throw new Exception("Image upload failed: $errorMsg");
                     }
                 }
                 
-                // Set featured image (first uploaded image)
+                // Handle clearing featured_image if requested (when user removes featured_image and uploads new images)
+                if (isset($_POST['clear_featured_image']) && $_POST['clear_featured_image'] === '1') {
+                    $clearStmt = $pdo->prepare("UPDATE posts SET featured_image = NULL WHERE id = ?");
+                    $clearStmt->execute([$postId]);
+                    $currentFeaturedImage = ''; // Clear the variable
+                }
+                
+                // Set featured image (first uploaded image if new images were uploaded)
                 if (!empty($uploadedImages)) {
                     $featuredStmt = $pdo->prepare("
                         UPDATE posts SET featured_image = ? WHERE id = ?
                     ");
                     $featuredStmt->execute([$uploadedImages[0], $postId]);
+                } elseif ($deletedFeaturedImage || empty($currentFeaturedImage)) {
+                    // If featured image was deleted or doesn't exist, set it to the first remaining image
+                    $stmt = $pdo->prepare("SELECT image_path FROM post_images WHERE post_id = ? ORDER BY sort_order ASC, created_at ASC LIMIT 1");
+                    $stmt->execute([$postId]);
+                    $firstImage = $stmt->fetch();
+                    if ($firstImage) {
+                        $featuredStmt = $pdo->prepare("
+                            UPDATE posts SET featured_image = ? WHERE id = ?
+                        ");
+                        $featuredStmt->execute([$firstImage['image_path'], $postId]);
+                    }
                 }
             }
             
@@ -435,7 +564,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Set success message and redirect to post management
             if ($isEdit) {
-                $successMsg = urlencode('Post updated successfully!');
+                $successMsg = urlencode('Post Updated Successfully');
             } else {
                 $successMsg = urlencode('Post created successfully!');
             }
@@ -622,25 +751,67 @@ $additional_css = '<link rel="stylesheet" href="../assets/css/editor.css">';
                         <p>Click to select images or drag and drop</p>
                         <small>Supported formats: JPEG, PNG, GIF, WebP (Max 10MB each). <strong>At least one image is required.</strong></small>
                     </div>
+                    <?php
+                    // Prepare existing images once for edit mode
+                    $existingImages = [];
+                    if ($isEdit && $post) {
+                        $stmt = $pdo->prepare("SELECT * FROM post_images WHERE post_id = ? ORDER BY sort_order ASC, created_at ASC");
+                        $stmt->execute([$post['id']]);
+                        $existingImages = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    }
+                    ?>
                     <div id="image-preview" class="image-preview">
-                        <?php if ($isEdit && $post): ?>
-                            <?php
-                            // Get existing images for this post
-                            $stmt = $pdo->prepare("SELECT * FROM post_images WHERE post_id = ?");
-                            $stmt->execute([$post['id']]);
-                            $existingImages = $stmt->fetchAll();
-                            ?>
-                            <?php foreach ($existingImages as $image): ?>
-                                <div class="image-preview-item existing-image">
-                                    <img src="../<?php echo htmlspecialchars($image['image_path']); ?>" alt="Existing image">
-                                    <button type="button" class="remove-image" onclick="removeExistingImage(<?php echo $image['id']; ?>)">
+                        <?php if ($isEdit && $post && !empty($existingImages)): ?>
+                            <?php foreach ($existingImages as $index => $image): ?>
+                                <?php 
+                                // Format image path for admin directory (go up one level to root)
+                                $imgPath = ltrim($image['image_path'], '/');
+                                $imgSrc = '../' . $imgPath;
+                                $imageId = (int)$image['id'];
+                                ?>
+                                <div class="image-preview-item existing-image" data-image-id="<?php echo $imageId; ?>" style="position: relative;">
+                                    <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" 
+                                         alt="Existing image"
+                                         style="position: relative; z-index: 1;"
+                                         onerror="this.style.display='none';">
+                                    <button type="button" 
+                                            class="remove-image" 
+                                            data-image-id="<?php echo $imageId; ?>"
+                                            onclick="removeExistingImage(<?php echo $imageId; ?>); return false;" 
+                                            title="Remove this image"
+                                            style="position: absolute !important; top: 6px !important; right: 6px !important; background: rgba(239, 68, 68, 0.95) !important; color: white !important; border: none !important; border-radius: 50% !important; width: 22px !important; height: 22px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 12px !important; z-index: 9999 !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;">
                                         <i class="fas fa-times"></i>
                                     </button>
                                     <div class="image-info">
-                                        <?php echo htmlspecialchars(basename($image['image_path'])); ?>
+                                        <?php echo htmlspecialchars(basename($imgPath), ENT_QUOTES, 'UTF-8'); ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
+                        <?php elseif ($isEdit && $post && !empty($post['featured_image'])): ?>
+                            <?php
+                            // Fallback: show featured_image if no post_images exist
+                            $img = ltrim($post['featured_image'], '/');
+                            $imgSrc = '../' . $img;
+                            // Create a special ID for featured_image removal
+                            $featuredImageId = 'featured_' . $post['id'];
+                            ?>
+                            <div class="image-preview-item existing-image" data-featured-image="1" data-image-id="<?php echo $featuredImageId; ?>" style="position: relative;">
+                                <img src="<?php echo htmlspecialchars($imgSrc, ENT_QUOTES, 'UTF-8'); ?>" 
+                                     alt="Existing image"
+                                     style="position: relative; z-index: 1;"
+                                     onerror="this.style.display='none';">
+                                <button type="button" 
+                                        class="remove-image" 
+                                        data-image-id="<?php echo $featuredImageId; ?>"
+                                        onclick="removeFeaturedImage(<?php echo $post['id']; ?>); return false;" 
+                                        title="Remove this image"
+                                        style="position: absolute !important; top: 6px !important; right: 6px !important; background: rgba(239, 68, 68, 0.95) !important; color: white !important; border: none !important; border-radius: 50% !important; width: 22px !important; height: 22px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 12px !important; z-index: 9999 !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                                <div class="image-info">
+                                    <?php echo htmlspecialchars(basename($img), ENT_QUOTES, 'UTF-8'); ?> (Featured Image)
+                                </div>
+                            </div>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -884,38 +1055,28 @@ $additional_css = '<link rel="stylesheet" href="../assets/css/editor.css">';
             const imageInput = document.getElementById('images');
             const previewContainer = document.getElementById('image-preview');
             
-            if (!imageInput) {
-                console.error('Image input not found');
-                return;
-            }
-            
-            if (!previewContainer) {
-                console.error('Preview container not found');
+            if (!imageInput || !previewContainer) {
                 return;
             }
             
             imageInput.addEventListener('change', function(e) {
-                console.log('Image input changed');
                 const files = Array.from(e.target.files);
-                console.log('Files selected:', files.length);
                 
-                // Clear existing previews (but keep existing images)
-                const existingImages = previewContainer.querySelectorAll('.existing-image');
-                previewContainer.innerHTML = '';
+                // Preserve existing images - store them before any manipulation
+                const existingImages = Array.from(previewContainer.querySelectorAll('.existing-image'));
                 
-                // Re-add existing images
-                existingImages.forEach(img => previewContainer.appendChild(img));
+                // Clear only new previews (not existing images)
+                const newPreviews = previewContainer.querySelectorAll('.image-preview-item:not(.existing-image)');
+                newPreviews.forEach(preview => preview.remove());
                 
                 if (files.length === 0) {
                     return;
                 }
                 
                 files.forEach((file, index) => {
-                    console.log('Processing file:', file.name, file.type);
                     if (file.type.startsWith('image/')) {
                         const reader = new FileReader();
                         reader.onload = function(e) {
-                            console.log('File read successfully:', file.name);
                             const previewItem = document.createElement('div');
                             previewItem.className = 'image-preview-item';
                             previewItem.innerHTML = `
@@ -930,8 +1091,6 @@ $additional_css = '<link rel="stylesheet" href="../assets/css/editor.css">';
                             previewContainer.appendChild(previewItem);
                         };
                         reader.readAsDataURL(file);
-                    } else {
-                        console.log('File is not an image:', file.name);
                     }
                 });
             });
@@ -998,14 +1157,102 @@ $additional_css = '<link rel="stylesheet" href="../assets/css/editor.css">';
             fileInput.dispatchEvent(new Event('change'));
         }
         
+        // Ensure all existing images have remove buttons on page load
+        function ensureRemoveButtons() {
+            // Find ALL existing-image containers, not just those with data-image-id
+            const allExistingImages = document.querySelectorAll('.existing-image');
+            
+            allExistingImages.forEach(function(imgContainer, index) {
+                const imageId = imgContainer.getAttribute('data-image-id');
+                const isFeatured = imgContainer.hasAttribute('data-featured-image');
+                
+                // Check if remove button already exists
+                let removeBtn = imgContainer.querySelector('.remove-image');
+                
+                // Add button if it has an imageId (including featured_image with special ID)
+                if (!removeBtn && imageId) {
+                    // Create remove button if it doesn't exist
+                    removeBtn = document.createElement('button');
+                    removeBtn.type = 'button';
+                    removeBtn.className = 'remove-image';
+                    removeBtn.title = 'Remove this image';
+                    removeBtn.setAttribute('data-image-id', imageId);
+                    removeBtn.style.cssText = 'position: absolute !important; top: 6px !important; right: 6px !important; background: rgba(239, 68, 68, 0.95) !important; color: white !important; border: none !important; border-radius: 50% !important; width: 22px !important; height: 22px !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; font-size: 12px !important; z-index: 9999 !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;';
+                    removeBtn.innerHTML = '<i class="fas fa-times"></i>';
+                    // Check if this is a featured image (starts with 'featured_')
+                    if (imageId && imageId.toString().startsWith('featured_')) {
+                        const postId = parseInt(imageId.toString().replace('featured_', ''));
+                        removeBtn.onclick = function(e) { 
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeFeaturedImage(postId); 
+                        };
+                    } else {
+                        removeBtn.onclick = function(e) { 
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeExistingImage(parseInt(imageId)); 
+                        };
+                    }
+                    imgContainer.style.position = 'relative';
+                    imgContainer.appendChild(removeBtn);
+                } else if (removeBtn) {
+                    // Force visibility with maximum z-index
+                    removeBtn.style.cssText += 'display: flex !important; visibility: visible !important; opacity: 1 !important; z-index: 9999 !important; pointer-events: auto !important;';
+                    removeBtn.style.display = 'flex';
+                    removeBtn.style.visibility = 'visible';
+                    removeBtn.style.opacity = '1';
+                    removeBtn.style.zIndex = '9999';
+                    removeBtn.style.pointerEvents = 'auto';
+                }
+            });
+        }
+        
+        // Run on DOM ready and also after a short delay to catch any late-loading elements
+        document.addEventListener('DOMContentLoaded', ensureRemoveButtons);
+        setTimeout(ensureRemoveButtons, 100);
+        setTimeout(ensureRemoveButtons, 500);
+        
+        // Handle removal of featured_image (when no post_images exist)
+        function removeFeaturedImage(postId) {
+            const imagePreview = document.getElementById('image-preview');
+            const imageInput = document.getElementById('images');
+            const newImages = imageInput && imageInput.files && imageInput.files.length > 0;
+            
+            if (!newImages) {
+                alert('Please upload at least one new image before removing the featured image. At least one image is required for posts.');
+                return;
+            }
+            
+            if (confirm('Are you sure you want to remove this featured image? Make sure you have uploaded new images first.')) {
+                // Create a hidden input to mark featured_image for clearing
+                const deleteInput = document.createElement('input');
+                deleteInput.type = 'hidden';
+                deleteInput.name = 'clear_featured_image';
+                deleteInput.value = '1';
+                document.querySelector('form').appendChild(deleteInput);
+                
+                // Remove the preview item
+                const featuredImageContainer = imagePreview.querySelector('[data-featured-image="1"]');
+                if (featuredImageContainer) {
+                    featuredImageContainer.remove();
+                }
+            }
+        }
+        
         function removeExistingImage(imageId) {
             const imagePreview = document.getElementById('image-preview');
             const imageInput = document.getElementById('images');
-            const existingImages = imagePreview.querySelectorAll('.existing-image');
+            const existingImages = imagePreview.querySelectorAll('.existing-image:not([data-featured-image="1"])');
+            const featuredImage = imagePreview.querySelector('[data-featured-image="1"]');
             const newImages = imageInput && imageInput.files && imageInput.files.length > 0;
             
             // Check if removing this image would leave no images
-            if (existingImages.length === 1 && !newImages) {
+            // Count only actual post_images (not featured_image fallback)
+            const remainingImages = existingImages.length - 1; // -1 because we're removing one
+            const hasFeaturedFallback = featuredImage !== null;
+            
+            if (remainingImages === 0 && !hasFeaturedFallback && !newImages) {
                 alert('Cannot remove the last image. At least one image is required for posts. Please upload a new image before removing this one.');
                 return;
             }

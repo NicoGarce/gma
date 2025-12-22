@@ -600,7 +600,12 @@ function getPostImages($postId) {
         ORDER BY sort_order ASC, created_at ASC
     ");
     $stmt->execute([$postId]);
-    return $stmt->fetchAll();
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    // Debug: Log if no images found
+    if (empty($result)) {
+        error_log("No images found for post ID: $postId");
+    }
+    return $result;
 }
 
 // Get SDG post images
