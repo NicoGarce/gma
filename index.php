@@ -412,7 +412,7 @@ include 'app/includes/header.php';
     <section class="hero">
         <div class="hero-background">
             <img 
-                src="assets/images/slider-1.jpg" 
+                src="assets/images/GMA Cover.png" 
                 alt="University of Perpetual Help System - GMA Campus" 
                 class="hero-image">
         </div>
@@ -742,6 +742,57 @@ include 'app/includes/header.php';
                 font-size: 2.5rem;
             }
         }
+        
+        /* Responsive styles for GMA layout */
+        @media (max-width: 992px) {
+            .col-md-4.col-gutter,
+            .col-md-3.text-center {
+                flex: 0 0 50% !important;
+                max-width: 50% !important;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .col-md-4.col-gutter,
+            .col-md-3.text-center,
+            .col-md-4 {
+                flex: 0 0 100% !important;
+                max-width: 100% !important;
+            }
+            
+            .section-features .row-gutter {
+                margin: 0 !important;
+            }
+            
+            .featured-item {
+                margin-bottom: 1.5rem !important;
+            }
+            
+        }
+        
+        .row.row-gutter {
+            margin-left: 0; /* Remove left margin */
+            margin-right: 0; /* Remove right margin */
+            padding-left: 0; /* Remove left padding */
+            padding-right: 0; /* Remove right padding */
+        }
+        .programs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensure cards are evenly distributed */
+            gap: 20px;
+            justify-items: center; /* Center align items within the grid */
+            margin: 0 auto; /* Center the grid within the container */
+        }
+        .program-card {
+            width: 100%;
+            max-width: 300px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
     </style>
 
     <!-- Programs Offered Section -->
@@ -755,152 +806,163 @@ include 'app/includes/header.php';
             </div>
                             </div>
                             </div>
-            <div class="row row-gutter" style="display: flex; flex-wrap: wrap; margin: 0 -15px;">
-                <div class="col-md-4 col-gutter" style="padding: 0 15px; flex: 0 0 33.333%; max-width: 33.333%;">
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-user-nurse"></i>
+            <div class="row row-gutter" style="display: flex; flex-wrap: wrap;">
+                <div class="programs-grid">
+                    <div class="program-column">
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-microphone"></i>
                             </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Nursing</h4>
+                            <div class="featured-text">
+                                <h4 class="program-title">AB Communication Arts</h4>
                             </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-book-reader"></i>
                             </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-heartbeat"></i>
+                            <div class="featured-text">
+                                <h4 class="program-title">Bachelor of Elementary Education</h4>
                             </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Physical Therapy</h4>
-                    </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-chalkboard-teacher"></i>
                             </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                                    <i class="fas fa-laptop-code"></i>
+                            <div class="featured-text">
+                                <h4 class="program-title">Bachelor of Secondary Education</h4>
+                            </div>
                         </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Information Technology</h4>
-                        </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-computer"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Computer Science</h4>
-                        </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-microphone"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BA Communication Arts</h4>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">AB/BS Psychology</h4>
+                            </div>
                         </div>
                     </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-graduation-cap"></i>
+                    <div class="program-column">
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-balance-scale"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Criminology</h4>
+                            </div>
                         </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">Senior High School Tracks/Strands</h4>
-                            <p class="program-description">Academic | Art and Design | Sports | Technical-Vocational Livelihood</p>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-laptop-code"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Information Technology</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-code"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Computer Science</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-user-nurse"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Nursing</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-column">
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Accountancy</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Business Administration</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-umbrella-beach"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Tourism Management</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-hotel"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Hospitality Management</h4>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="program-column">
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Civil Engineering</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-industry"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Industrial Engineering</h4>
+                            </div>
+                        </div>
+                        <div class="program-card">
+                            <div class="program-icon-wrapper">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="featured-text">
+                                <h4 class="program-title">BS Computer Engineering</h4>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4 col-gutter" style="padding: 0 15px; flex: 0 0 33.333%; max-width: 33.333%;">
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                                    <i class="fas fa-cogs"></i>
-                            </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Engineering</h4>
-                        </div>
-                            </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-calculator"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Accountancy</h4>
-                        </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-briefcase"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Business Administration</h4>
-                        </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                                    <i class="fas fa-chalkboard-teacher"></i>
-                            </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">Bachelor of Secondary Education</h4>
-                        </div>
-                            </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-phone"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">Call Center Training Program</h4>
-                        </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                                    <i class="fas fa-school"></i>
-                            </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">Basic Education</h4>
-                            <p class="program-description">Pre-School | Grade School | Middle School | Junior High School</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4 col-gutter" style="padding: 0 15px; flex: 0 0 33.333%; max-width: 33.333%;">
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-book-reader"></i>
-            </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">Bachelor of Elementary Education</h4>
-        </div>
-            </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-hotel"></i>
-                </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Hospitality Management</h4>
-                                        </div>
-                                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-umbrella-beach"></i>
-                                    </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">BS Tourism Management</h4>
-                            <p class="program-description">Hotel and Restaurant Management | Nutrition and Dietetics | Bachelor of Science in Tourism Management</p>
-                                </div>
-                        </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-brain"></i>
-                    </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">AB/BS Psychology</h4>
-                </div>
-                    </div>
-                    <div class="program-card">
-                        <div class="program-icon-wrapper">
-                            <i class="fas fa-language"></i>
-                        </div>
-                        <div class="featured-text">
-                            <h4 class="program-title">English Proficiency Training</h4>
-                        </div>
-                    </div>
-                </div>
+
+                <style>
+                    .programs-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Ensure cards are evenly distributed */
+                        gap: 10px;
+                        justify-items: center; /* Center align items within the grid */
+                    }
+                    .program-card {
+                        width: 100%; /* Ensure cards take full width of their grid cell */
+                        max-width: 300px; /* Set a maximum width for better appearance */
+                        padding: 20px;
+                        text-align: center;
+                        border: 1px solid #ddd;
+                        border-radius: 8px;
+                        background-color: #f9f9f9;
+                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                    }
+                    .program-icon-wrapper {
+                        margin-bottom: 10px;
+                    }
+                    .featured-text {
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+                </style>
             </div>
         </div>
     </section>

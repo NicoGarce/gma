@@ -112,23 +112,21 @@ $base_path = $GLOBALS['base_path'];
 // Define navbar items configuration for checking sub-items
 $navbar_items_config = [
     'programs' => [
-        'bs-nursing' => 'BS Nursing',
-        'bs-physical-therapy' => 'BS Physical Therapy',
+        'ab-communication-arts' => 'AB Communication Arts',
+        'bachelor-elementary-education' => 'Bachelor of Elementary Education',
+        'bachelor-secondary-education' => 'Bachelor of Secondary Education',
+        'ab-bs-psychology' => 'AB/BS Psychology',
+        'bs-criminology' => 'BS Criminology',
         'bs-information-technology' => 'BS Information Technology',
         'bs-computer-science' => 'BS Computer Science',
-        'ba-communication-arts' => 'BA Communication Arts',
-        'senior-high-school' => 'Senior High School Tracks/Strands',
-        'bs-engineering' => 'BS Engineering',
+        'bs-nursing' => 'BS Nursing',
         'bs-accountancy' => 'BS Accountancy',
         'bs-business-administration' => 'BS Business Administration',
-        'bachelor-secondary-education' => 'Bachelor of Secondary Education',
-        'call-center-training' => 'Call Center Training Program',
-        'basic-education' => 'Basic Education',
-        'bachelor-elementary-education' => 'Bachelor of Elementary Education',
-        'bs-hospitality-management' => 'BS Hospitality Management',
         'bs-tourism-management' => 'BS Tourism Management',
-        'ab-bs-psychology' => 'AB/BS Psychology',
-        'english-proficiency-training' => 'English Proficiency Training'
+        'bs-hospitality-management' => 'BS Hospitality Management',
+        'bs-civil-engineering' => 'BS Civil Engineering',
+        'bs-industrial-engineering' => 'BS Industrial Engineering',
+        'bs-computer-engineering' => 'BS Computer Engineering'
     ],
     'academics' => [
         'admission-scholarship' => 'Admission & Scholarship',
@@ -1237,7 +1235,7 @@ $navbar_items_config = [
                     <?php if (isNavbarItemVisible('programs')): ?>
                     <div class="nav-item dropdown">
                         <a href="<?php echo $base_path; ?>programs.php" class="nav-link dropdown-toggle <?php 
-                            $is_programs_active = ($current_page == 'programs' || strpos($current_page, 'programs') !== false || in_array($current_page, ['bs-nursing', 'bs-physical-therapy', 'bs-information-technology', 'bs-computer-science', 'ba-communication-arts', 'senior-high-school', 'bs-engineering', 'bs-accountancy', 'bs-business-administration', 'bachelor-secondary-education', 'call-center-training', 'basic-education', 'bachelor-elementary-education', 'bs-hospitality-management', 'bs-tourism-management', 'ab-bs-psychology', 'english-proficiency-training']));
+                            $is_programs_active = ($current_page == 'programs' || strpos($current_page, 'programs') !== false || in_array($current_page, ['ab-communication-arts', 'bachelor-elementary-education', 'bachelor-secondary-education', 'ab-bs-psychology', 'bs-criminology', 'bs-information-technology', 'bs-computer-science', 'bs-nursing', 'bs-accountancy', 'bs-business-administration', 'bs-tourism-management', 'bs-hospitality-management', 'bs-civil-engineering', 'bs-industrial-engineering', 'bs-computer-engineering']));
                             echo $is_programs_active ? 'active' : '';
                         ?>" style="<?php echo $is_programs_active ? 'background: rgba(255, 198, 62, 0.2) !important; color: #ffc63e !important;' : ''; ?>">Programs <i class="fas fa-chevron-down desktop-chevron"></i></a>
                         <div class="dropdown-menu programs-dropdown-menu">
@@ -1248,11 +1246,20 @@ $navbar_items_config = [
                                     <span class="dropdown-placeholder-text">No programs available at this time.</span>
                                 </div>
                             <?php else: ?>
-                                <?php if (isNavbarItemVisible('programs', 'bs-nursing')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bs-nursing.php" class="dropdown-link <?php echo ($current_page == 'bs-nursing') ? 'active' : ''; ?>">BS Nursing</a>
+                                <?php if (isNavbarItemVisible('programs', 'ab-communication-arts')): ?>
+                                <a href="<?php echo $base_path; ?>programs/ab-communication-arts.php" class="dropdown-link <?php echo ($current_page == 'ab-communication-arts') ? 'active' : ''; ?>">AB Communication Arts</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'bs-physical-therapy')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bs-physical-therapy.php" class="dropdown-link <?php echo ($current_page == 'bs-physical-therapy') ? 'active' : ''; ?>">BS Physical Therapy</a>
+                                <?php if (isNavbarItemVisible('programs', 'bachelor-elementary-education')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bachelor-elementary-education.php" class="dropdown-link <?php echo ($current_page == 'bachelor-elementary-education') ? 'active' : ''; ?>">Bachelor of Elementary Education</a>
+                                <?php endif; ?>
+                                <?php if (isNavbarItemVisible('programs', 'bachelor-secondary-education')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bachelor-secondary-education.php" class="dropdown-link <?php echo ($current_page == 'bachelor-secondary-education') ? 'active' : ''; ?>">Bachelor of Secondary Education</a>
+                                <?php endif; ?>
+                                <?php if (isNavbarItemVisible('programs', 'ab-bs-psychology')): ?>
+                                <a href="<?php echo $base_path; ?>programs/ab-bs-psychology.php" class="dropdown-link <?php echo ($current_page == 'ab-bs-psychology') ? 'active' : ''; ?>">AB/BS Psychology</a>
+                                <?php endif; ?>
+                                <?php if (isNavbarItemVisible('programs', 'bs-criminology')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-criminology.php" class="dropdown-link <?php echo ($current_page == 'bs-criminology') ? 'active' : ''; ?>">BS Criminology</a>
                                 <?php endif; ?>
                                 <?php if (isNavbarItemVisible('programs', 'bs-information-technology')): ?>
                                 <a href="<?php echo $base_path; ?>programs/bs-information-technology.php" class="dropdown-link <?php echo ($current_page == 'bs-information-technology') ? 'active' : ''; ?>">BS Information Technology</a>
@@ -1260,14 +1267,8 @@ $navbar_items_config = [
                                 <?php if (isNavbarItemVisible('programs', 'bs-computer-science')): ?>
                                 <a href="<?php echo $base_path; ?>programs/bs-computer-science.php" class="dropdown-link <?php echo ($current_page == 'bs-computer-science') ? 'active' : ''; ?>">BS Computer Science</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'ba-communication-arts')): ?>
-                                <a href="<?php echo $base_path; ?>programs/ba-communication-arts.php" class="dropdown-link <?php echo ($current_page == 'ba-communication-arts') ? 'active' : ''; ?>">BA Communication Arts</a>
-                                <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'senior-high-school')): ?>
-                                <a href="<?php echo $base_path; ?>programs/senior-high-school.php" class="dropdown-link <?php echo ($current_page == 'senior-high-school') ? 'active' : ''; ?>">Senior High School Tracks/Strands</a>
-                                <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'bs-engineering')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bs-engineering.php" class="dropdown-link <?php echo ($current_page == 'bs-engineering') ? 'active' : ''; ?>">BS Engineering</a>
+                                <?php if (isNavbarItemVisible('programs', 'bs-nursing')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-nursing.php" class="dropdown-link <?php echo ($current_page == 'bs-nursing') ? 'active' : ''; ?>">BS Nursing</a>
                                 <?php endif; ?>
                                 <?php if (isNavbarItemVisible('programs', 'bs-accountancy')): ?>
                                 <a href="<?php echo $base_path; ?>programs/bs-accountancy.php" class="dropdown-link <?php echo ($current_page == 'bs-accountancy') ? 'active' : ''; ?>">BS Accountancy</a>
@@ -1275,34 +1276,20 @@ $navbar_items_config = [
                                 <?php if (isNavbarItemVisible('programs', 'bs-business-administration')): ?>
                                 <a href="<?php echo $base_path; ?>programs/bs-business-administration.php" class="dropdown-link <?php echo ($current_page == 'bs-business-administration') ? 'active' : ''; ?>">BS Business Administration</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'bachelor-secondary-education')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bachelor-secondary-education.php" class="dropdown-link <?php echo ($current_page == 'bachelor-secondary-education') ? 'active' : ''; ?>">Bachelor of Secondary Education</a>
-                                <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'call-center-training')): ?>
-                                <a href="<?php echo $base_path; ?>programs/call-center-training.php" class="dropdown-link <?php echo ($current_page == 'call-center-training') ? 'active' : ''; ?>">Call Center Training Program</a>
-                                <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'basic-education')): ?>
-                                <div class="dropdown-item-with-submenu">
-                                    <a href="#" class="dropdown-link dropdown-parent">Basic Education <i class="fas fa-chevron-down submenu-chevron"></i></a>
-                                    <div class="submenu-dropdown">
-                                        <a href="<?php echo $base_path; ?>programs/basic-education.php" class="submenu-link <?php echo ($current_page == 'basic-education') ? 'active' : ''; ?>">Pre-School | Grade School | Middle School | Junior High School</a>
-                                    </div>
-                                </div>
-                                <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'bachelor-elementary-education')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bachelor-elementary-education.php" class="dropdown-link <?php echo ($current_page == 'bachelor-elementary-education') ? 'active' : ''; ?>">Bachelor of Elementary Education</a>
+                                <?php if (isNavbarItemVisible('programs', 'bs-tourism-management')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-tourism-management.php" class="dropdown-link <?php echo ($current_page == 'bs-tourism-management') ? 'active' : ''; ?>">BS Tourism Management</a>
                                 <?php endif; ?>
                                 <?php if (isNavbarItemVisible('programs', 'bs-hospitality-management')): ?>
                                 <a href="<?php echo $base_path; ?>programs/bs-hospitality-management.php" class="dropdown-link <?php echo ($current_page == 'bs-hospitality-management') ? 'active' : ''; ?>">BS Hospitality Management</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'bs-tourism-management')): ?>
-                                <a href="<?php echo $base_path; ?>programs/bs-tourism-management.php" class="dropdown-link <?php echo ($current_page == 'bs-tourism-management') ? 'active' : ''; ?>">BS Tourism Management</a>
+                                <?php if (isNavbarItemVisible('programs', 'bs-civil-engineering')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-civil-engineering.php" class="dropdown-link <?php echo ($current_page == 'bs-civil-engineering') ? 'active' : ''; ?>">BS Civil Engineering</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'ab-bs-psychology')): ?>
-                                <a href="<?php echo $base_path; ?>programs/ab-bs-psychology.php" class="dropdown-link <?php echo ($current_page == 'ab-bs-psychology') ? 'active' : ''; ?>">AB/BS Psychology</a>
+                                <?php if (isNavbarItemVisible('programs', 'bs-industrial-engineering')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-industrial-engineering.php" class="dropdown-link <?php echo ($current_page == 'bs-industrial-engineering') ? 'active' : ''; ?>">BS Industrial Engineering</a>
                                 <?php endif; ?>
-                                <?php if (isNavbarItemVisible('programs', 'english-proficiency-training')): ?>
-                                <a href="<?php echo $base_path; ?>programs/english-proficiency-training.php" class="dropdown-link <?php echo ($current_page == 'english-proficiency-training') ? 'active' : ''; ?>">English Proficiency Training</a>
+                                <?php if (isNavbarItemVisible('programs', 'bs-computer-engineering')): ?>
+                                <a href="<?php echo $base_path; ?>programs/bs-computer-engineering.php" class="dropdown-link <?php echo ($current_page == 'bs-computer-engineering') ? 'active' : ''; ?>">BS Computer Engineering</a>
                                 <?php endif; ?>
                             <?php endif; ?>
                         </div>
@@ -1447,7 +1434,7 @@ $navbar_items_config = [
             
             <?php if (isNavbarItemVisible('programs')): ?>
             <div class="mobile-nav-item mobile-dropdown">
-                <a href="<?php echo $base_path; ?>programs.php" class="mobile-nav-link mobile-dropdown-toggle <?php echo ($current_page == 'programs' || strpos($current_page, 'programs') !== false || in_array($current_page, ['bs-nursing', 'bs-physical-therapy', 'bs-information-technology', 'bs-computer-science', 'ba-communication-arts', 'senior-high-school', 'bs-engineering', 'bs-accountancy', 'bs-business-administration', 'bachelor-secondary-education', 'call-center-training', 'basic-education', 'bachelor-elementary-education', 'bs-hospitality-management', 'bs-tourism-management', 'ab-bs-psychology', 'english-proficiency-training'])) ? 'active' : ''; ?>">Programs <i class="fas fa-chevron-down mobile-chevron"></i></a>
+                <a href="<?php echo $base_path; ?>programs.php" class="mobile-nav-link mobile-dropdown-toggle <?php echo ($current_page == 'programs' || strpos($current_page, 'programs') !== false || in_array($current_page, ['ab-communication-arts', 'bachelor-elementary-education', 'bachelor-secondary-education', 'ab-bs-psychology', 'bs-criminology', 'bs-information-technology', 'bs-computer-science', 'bs-nursing', 'bs-accountancy', 'bs-business-administration', 'bs-tourism-management', 'bs-hospitality-management', 'bs-civil-engineering', 'bs-industrial-engineering', 'bs-computer-engineering'])) ? 'active' : ''; ?>">Programs <i class="fas fa-chevron-down mobile-chevron"></i></a>
                 <div class="mobile-dropdown-menu">
                     <?php 
                     $programs_subitems = isset($navbar_items_config['programs']) ? $navbar_items_config['programs'] : [];
@@ -1456,11 +1443,20 @@ $navbar_items_config = [
                             <span class="dropdown-placeholder-text">No programs available at this time.</span>
                         </div>
                     <?php else: ?>
-                        <?php if (isNavbarItemVisible('programs', 'bs-nursing')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bs-nursing.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-nursing') ? 'active' : ''; ?>">BS Nursing</a>
+                        <?php if (isNavbarItemVisible('programs', 'ab-communication-arts')): ?>
+                        <a href="<?php echo $base_path; ?>programs/ab-communication-arts.php" class="mobile-dropdown-link <?php echo ($current_page == 'ab-communication-arts') ? 'active' : ''; ?>">AB Communication Arts</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'bs-physical-therapy')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bs-physical-therapy.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-physical-therapy') ? 'active' : ''; ?>">BS Physical Therapy</a>
+                        <?php if (isNavbarItemVisible('programs', 'bachelor-elementary-education')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bachelor-elementary-education.php" class="mobile-dropdown-link <?php echo ($current_page == 'bachelor-elementary-education') ? 'active' : ''; ?>">Bachelor of Elementary Education</a>
+                        <?php endif; ?>
+                        <?php if (isNavbarItemVisible('programs', 'bachelor-secondary-education')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bachelor-secondary-education.php" class="mobile-dropdown-link <?php echo ($current_page == 'bachelor-secondary-education') ? 'active' : ''; ?>">Bachelor of Secondary Education</a>
+                        <?php endif; ?>
+                        <?php if (isNavbarItemVisible('programs', 'ab-bs-psychology')): ?>
+                        <a href="<?php echo $base_path; ?>programs/ab-bs-psychology.php" class="mobile-dropdown-link <?php echo ($current_page == 'ab-bs-psychology') ? 'active' : ''; ?>">AB/BS Psychology</a>
+                        <?php endif; ?>
+                        <?php if (isNavbarItemVisible('programs', 'bs-criminology')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-criminology.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-criminology') ? 'active' : ''; ?>">BS Criminology</a>
                         <?php endif; ?>
                         <?php if (isNavbarItemVisible('programs', 'bs-information-technology')): ?>
                         <a href="<?php echo $base_path; ?>programs/bs-information-technology.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-information-technology') ? 'active' : ''; ?>">BS Information Technology</a>
@@ -1468,14 +1464,8 @@ $navbar_items_config = [
                         <?php if (isNavbarItemVisible('programs', 'bs-computer-science')): ?>
                         <a href="<?php echo $base_path; ?>programs/bs-computer-science.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-computer-science') ? 'active' : ''; ?>">BS Computer Science</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'ba-communication-arts')): ?>
-                        <a href="<?php echo $base_path; ?>programs/ba-communication-arts.php" class="mobile-dropdown-link <?php echo ($current_page == 'ba-communication-arts') ? 'active' : ''; ?>">BA Communication Arts</a>
-                        <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'senior-high-school')): ?>
-                        <a href="<?php echo $base_path; ?>programs/senior-high-school.php" class="mobile-dropdown-link <?php echo ($current_page == 'senior-high-school') ? 'active' : ''; ?>">Senior High School Tracks/Strands</a>
-                        <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'bs-engineering')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bs-engineering.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-engineering') ? 'active' : ''; ?>">BS Engineering</a>
+                        <?php if (isNavbarItemVisible('programs', 'bs-nursing')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-nursing.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-nursing') ? 'active' : ''; ?>">BS Nursing</a>
                         <?php endif; ?>
                         <?php if (isNavbarItemVisible('programs', 'bs-accountancy')): ?>
                         <a href="<?php echo $base_path; ?>programs/bs-accountancy.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-accountancy') ? 'active' : ''; ?>">BS Accountancy</a>
@@ -1483,34 +1473,20 @@ $navbar_items_config = [
                         <?php if (isNavbarItemVisible('programs', 'bs-business-administration')): ?>
                         <a href="<?php echo $base_path; ?>programs/bs-business-administration.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-business-administration') ? 'active' : ''; ?>">BS Business Administration</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'bachelor-secondary-education')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bachelor-secondary-education.php" class="mobile-dropdown-link <?php echo ($current_page == 'bachelor-secondary-education') ? 'active' : ''; ?>">Bachelor of Secondary Education</a>
-                        <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'call-center-training')): ?>
-                        <a href="<?php echo $base_path; ?>programs/call-center-training.php" class="mobile-dropdown-link <?php echo ($current_page == 'call-center-training') ? 'active' : ''; ?>">Call Center Training Program</a>
-                        <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'basic-education')): ?>
-                        <div class="mobile-dropdown-item-with-submenu">
-                            <a href="#" class="mobile-dropdown-link mobile-dropdown-parent">Basic Education <i class="fas fa-chevron-right mobile-submenu-chevron"></i></a>
-                            <div class="mobile-submenu-dropdown">
-                                <a href="<?php echo $base_path; ?>programs/basic-education.php" class="mobile-submenu-link <?php echo ($current_page == 'basic-education') ? 'active' : ''; ?>">Pre-School | Grade School | Middle School | Junior High School</a>
-                            </div>
-                        </div>
-                        <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'bachelor-elementary-education')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bachelor-elementary-education.php" class="mobile-dropdown-link <?php echo ($current_page == 'bachelor-elementary-education') ? 'active' : ''; ?>">Bachelor of Elementary Education</a>
+                        <?php if (isNavbarItemVisible('programs', 'bs-tourism-management')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-tourism-management.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-tourism-management') ? 'active' : ''; ?>">BS Tourism Management</a>
                         <?php endif; ?>
                         <?php if (isNavbarItemVisible('programs', 'bs-hospitality-management')): ?>
                         <a href="<?php echo $base_path; ?>programs/bs-hospitality-management.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-hospitality-management') ? 'active' : ''; ?>">BS Hospitality Management</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'bs-tourism-management')): ?>
-                        <a href="<?php echo $base_path; ?>programs/bs-tourism-management.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-tourism-management') ? 'active' : ''; ?>">BS Tourism Management</a>
+                        <?php if (isNavbarItemVisible('programs', 'bs-civil-engineering')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-civil-engineering.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-civil-engineering') ? 'active' : ''; ?>">BS Civil Engineering</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'ab-bs-psychology')): ?>
-                        <a href="<?php echo $base_path; ?>programs/ab-bs-psychology.php" class="mobile-dropdown-link <?php echo ($current_page == 'ab-bs-psychology') ? 'active' : ''; ?>">AB/BS Psychology</a>
+                        <?php if (isNavbarItemVisible('programs', 'bs-industrial-engineering')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-industrial-engineering.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-industrial-engineering') ? 'active' : ''; ?>">BS Industrial Engineering</a>
                         <?php endif; ?>
-                        <?php if (isNavbarItemVisible('programs', 'english-proficiency-training')): ?>
-                        <a href="<?php echo $base_path; ?>programs/english-proficiency-training.php" class="mobile-dropdown-link <?php echo ($current_page == 'english-proficiency-training') ? 'active' : ''; ?>">English Proficiency Training</a>
+                        <?php if (isNavbarItemVisible('programs', 'bs-computer-engineering')): ?>
+                        <a href="<?php echo $base_path; ?>programs/bs-computer-engineering.php" class="mobile-dropdown-link <?php echo ($current_page == 'bs-computer-engineering') ? 'active' : ''; ?>">BS Computer Engineering</a>
                         <?php endif; ?>
                     <?php endif; ?>
                 </div>

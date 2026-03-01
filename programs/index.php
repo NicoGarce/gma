@@ -338,10 +338,6 @@ include '../app/includes/header.php';
                             <div class="card-content">
                                 <h4 class="program-title">Bachelor of Elementary Education</h4>
                                 <p class="program-description">Program preparing future elementary school teachers with comprehensive pedagogical training.</p>
-                                <div class="program-features">
-                                    <span class="feature-tag">Elementary</span>
-                                    <span class="feature-tag">Teaching</span>
-                                </div>
                             </div>
                             <div class="card-footer">
                                 <a href="bachelor-elementary-education.php" class="program-link">
@@ -362,10 +358,6 @@ include '../app/includes/header.php';
                             <div class="card-content">
                                 <h4 class="program-title">Bachelor of Secondary Education</h4>
                                 <p class="program-description">Program preparing future high school teachers with subject specialization and pedagogical expertise.</p>
-                                <div class="program-features">
-                                    <span class="feature-tag">Secondary</span>
-                                    <span class="feature-tag">Specialization</span>
-                                </div>
                             </div>
                             <div class="card-footer">
                                 <a href="bachelor-secondary-education.php" class="program-link">
@@ -504,41 +496,64 @@ include '../app/includes/header.php';
                                 <div class="program-badge">Bachelor</div>
                             </div>
                             <div class="card-content">
-                                <h4 class="program-title">BA Communication Arts</h4>
+                                <h4 class="program-title">AB Communication Arts</h4>
                                 <p class="program-description">Program covering media, journalism, broadcasting, and digital communication.</p>
-                                <div class="program-features">
-                                    <span class="feature-tag">Media</span>
-                                    <span class="feature-tag">Journalism</span>
-                                </div>
                             </div>
-                            <div class="card-footer">
-                                <a href="ba-communication-arts.php" class="program-link">
-                                    Learn More <i class="fas fa-arrow-right"></i>
-                                </a>
+                            <div class="card-content">
+                                <h4 class="program-title">Bachelor of Elementary Education</h4>
+                                <p class="program-description">Program preparing future elementary school teachers with comprehensive pedagogical training.</p>
                             </div>
-                        </div>
-                        <?php endif; ?>
-                        
-                        <?php if (isNavbarItemVisible('programs', 'ab-bs-psychology')): ?>
-                        <div class="program-card modern-card">
-                            <div class="card-header">
-                                <div class="program-icon">
-                                    <i class="fas fa-brain"></i>
-                                </div>
-                                <div class="program-badge">Bachelor</div>
+                            <div class="card-content">
+                                <h4 class="program-title">Bachelor of Secondary Education</h4>
+                                <p class="program-description">Program preparing future high school teachers with subject specialization and pedagogical expertise.</p>
                             </div>
                             <div class="card-content">
                                 <h4 class="program-title">AB/BS Psychology</h4>
                                 <p class="program-description">Program studying human behavior, mental processes, and psychological principles.</p>
-                                <div class="program-features">
-                                    <span class="feature-tag">Behavioral Science</span>
-                                    <span class="feature-tag">Mental Health</span>
-                                </div>
                             </div>
-                            <div class="card-footer">
-                                <a href="ab-bs-psychology.php" class="program-link">
-                                    Learn More <i class="fas fa-arrow-right"></i>
-                                </a>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Criminology</h4>
+                                <p class="program-description">Program focused on law enforcement, criminal justice, and forensic science.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Information Technology</h4>
+                                <p class="program-description">Comprehensive IT program covering systems administration, networking, and software development.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Computer Science</h4>
+                                <p class="program-description">Program focused on algorithms, programming, software engineering, and computer systems.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Nursing</h4>
+                                <p class="program-description">Comprehensive nursing education program preparing students for professional nursing practice.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Accountancy</h4>
+                                <p class="program-description">Comprehensive accounting program preparing students for CPA licensure and financial management careers.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Business Administration</h4>
+                                <p class="program-description">Program covering management, marketing, operations, and strategic business planning.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Tourism Management</h4>
+                                <p class="program-description">Program covering tourism operations, travel management, and destination marketing.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Hospitality Management</h4>
+                                <p class="program-description">Program focused on hotel and restaurant management with international standards.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Civil Engineering</h4>
+                                <p class="program-description">Comprehensive engineering program covering civil infrastructure and construction management.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Industrial Engineering</h4>
+                                <p class="program-description">Program focused on optimizing complex systems and processes in manufacturing and services.</p>
+                            </div>
+                            <div class="card-content">
+                                <h4 class="program-title">BS Computer Engineering</h4>
+                                <p class="program-description">Program combining computer science and electrical engineering for hardware and software integration.</p>
                             </div>
                         </div>
                         <?php endif; ?>

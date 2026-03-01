@@ -403,7 +403,7 @@ include '../app/includes/header.php';
         <div class="container">
             <div class="hero-content">
                 <h1 class="hero-title">Get in Touch</h1>
-                <p class="hero-subtitle">We're here to help and answer any questions you might have about UPHSL GMA Campus</p>
+                <p class="hero-subtitle">We're here to help and answer any questions you might have about UPHS GMA Campus</p>
             </div>
         </div>
     </section>
