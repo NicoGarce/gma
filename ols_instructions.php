@@ -40,7 +40,7 @@ include 'app/includes/header.php';
                 <div class="content-main">
                     <article class="content-article">
                         <h2>How to Access UPHS Online Services</h2>
-                        <p>This guide will help you access various online services provided by the University of Perpetual Help System Laguna. Select a platform below to view detailed instructions.</p>
+                        <p>This guide will help you access various online services provided by the University of Perpetual Help System GMA. Select a platform below to view detailed instructions.</p>
                         
                         <!-- Tab Navigation -->
                         <div class="tabs-container">
